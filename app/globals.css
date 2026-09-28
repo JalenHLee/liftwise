@@ -1,20 +1,30 @@
 @import "tailwindcss";
 
+/* Dark-first: a dim gym is the default reading condition, not an edge case. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0a0a0a;
+  --surface: #161616;
+  --foreground: #f5f5f5;
+  --muted: #9a9a9a;
+  --border: #2a2a2a;
+  --accent: #2dd4bf;
+  --accent-foreground: #04201c;
+  --danger: #f87171;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-danger: var(--danger);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: dark;
 }
 
 body {
