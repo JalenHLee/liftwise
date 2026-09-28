@@ -119,7 +119,7 @@ export function buildWeek(input: WeekPlanInput): WeekPlan {
     const muscle = needy[0];
 
     // Prefer the session where this muscle has the least work so far. Within it, fill slots in
-    // order up to 3 sets each (fewer, fuller exercises), then spread to the slot with fewest sets.
+    // order up to 4 sets each (fewer, fuller exercises), then spread to the slot with fewest sets.
     let best: { s: number; slot: FilledSlot; score: [number, number] } | undefined;
     for (let s = 0; s < sessions.length; s++) {
       for (const slot of sessions[s].slots) {

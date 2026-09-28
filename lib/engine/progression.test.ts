@@ -85,7 +85,25 @@ describe("double progression", () => {
     expect(within).toMatchObject({ targetReps: 7, change: "hold" });
   });
 
+  test("sessions with no sets logged (skipped exercise) are ignored", () => {
+    const skipped = session(60, []);
+    // Skipped latest session: decision comes from the last real session (within range → hold).
+    expect(nextProgression(bench, target, [session(60, [8, 8, 8]), skipped], green)).toMatchObject({
+      loadKg: 60,
+      targetReps: 9,
+      change: "hold",
+    });
+    // A skip between two bad sessions doesn't break the "2 in a row" rule.
+    expect(nextProgression(bench, target, [session(62.5, [4, 4, 4]), skipped, session(62.5, [4, 3, 3])], green).change).toBe(
+      "decrease",
+    );
+    // Bodyweight: no "infinite reps" from an empty session.
+    const pushUpTarget = prescribe(pushUp, "muscle", 3);
+    expect(nextProgression(pushUp, pushUpTarget, [session(0, [7, 7, 6]), session(0, [])], green).targetReps).toBe(7);
+  });
+
   test("needs at least one logged session", () => {
     expect(() => nextProgression(bench, target, [], green)).toThrow();
+    expect(() => nextProgression(bench, target, [session(60, []), session(60, [])], green)).toThrow();
   });
 });

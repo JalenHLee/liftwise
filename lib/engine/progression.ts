@@ -26,6 +26,7 @@ const isBad = (session: LoggedSession, target: Target) => session.sets[0].reps <
 
 /**
  * Double progression. `history` is this exercise's past sessions, oldest first, newest last.
+ * Sessions with no sets logged (e.g. a skipped exercise) are ignored.
  */
 export function nextProgression(
   exercise: Exercise,
@@ -33,9 +34,10 @@ export function nextProgression(
   history: LoggedSession[],
   options: ProgressionOptions,
 ): ProgressionResult {
-  const last = history.at(-1);
+  const logged = history.filter((s) => s.sets.length > 0);
+  const last = logged.at(-1);
   if (!last) throw new Error("Progression needs at least one logged session");
-  const previous = history.at(-2);
+  const previous = logged.at(-2);
   const lowest = Math.min(...last.sets.map((s) => s.reps));
   const hitTop = last.sets.every((s) => s.reps >= target.repMax && s.rir >= target.rirMin);
   const aimOneMore = Math.min(target.repMax, Math.max(target.repMin, lowest + 1));
