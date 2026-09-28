@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # Liftwise
 
 ## What we're building
@@ -79,4 +81,4 @@ Mobile-first, one-handed use, large tap targets.
 8. Eval set (20 check-in scenarios with expected behaviors)
 
 ## Status
-Current: not started. Next: slice 1 (scaffold).
+Current: slice 1 (scaffold) done. Next: slice 2 (exercise library + rules engine).
