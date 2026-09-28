@@ -82,10 +82,17 @@ export type Exercise = {
   keyLift: boolean;
 };
 
-export type Goal = "strength" | "muscle" | "general";
-export type Experience = "beginner" | "intermediate" | "advanced";
-export type EquipmentSetup = "full_gym" | "unit_gym" | "bodyweight";
-export type Readiness = "green" | "yellow" | "red";
+export const GOALS = ["strength", "muscle", "general"] as const;
+export type Goal = (typeof GOALS)[number];
+
+export const EXPERIENCES = ["beginner", "intermediate", "advanced"] as const;
+export type Experience = (typeof EXPERIENCES)[number];
+
+export const EQUIPMENT_SETUPS = ["full_gym", "unit_gym", "bodyweight"] as const;
+export type EquipmentSetup = (typeof EQUIPMENT_SETUPS)[number];
+
+export const READINESS_LEVELS = ["green", "yellow", "red"] as const;
+export type Readiness = (typeof READINESS_LEVELS)[number];
 
 export type PlannedExercise = {
   exerciseId: string;

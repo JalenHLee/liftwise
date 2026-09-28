@@ -57,6 +57,20 @@ Program templates (never let Claude invent programs):
 
 Mobile-first, one-handed use, large tap targets.
 
+## Design
+- The readiness signal is the brand: today's readiness (green /
+  yellow / red) visibly shapes the screen through a subtle accent
+  color or glow, not just a status label.
+- Numbers are the hero: weights, reps and sets use big, bold,
+  confident numerals, readable mid-set.
+- Dark-first and gym-ready: high contrast, readable in a dim gym,
+  large tap targets placed in the thumb zone.
+- Calm, not hype: feels like a smart coach, not a flashy fitness app.
+  Minimal and precise, one accent color at a time.
+- Small moments of delight: satisfying feedback when logging a set,
+  subtle animation when the plan adjusts.
+- Mobile-first (design at 390px width first), one-handed use.
+
 ## Data (Supabase)
 `profiles`, `exercises` (static seed, ~40), `checkins`, `sessions`, `set_logs`. RLS: users only see their own rows.
 
@@ -111,4 +125,8 @@ Engine assumptions made while building slice 2 (not yet confirmed by the owner):
 - Onboarding values: goal = strength / muscle / general (only strength changes rep ranges); energy and soreness are scored 1–5.
 
 ## Status
-Current: slice 2 (exercise library + rules engine) done. Next: slice 3 (Supabase auth + onboarding).
+Current: slice 3 (Supabase auth + onboarding) done. Next: slice 4 (daily check-in).
+
+Manual step needed in Supabase: run `supabase/migrations/0001_profiles_and_onboarding.sql`
+in the SQL Editor, and confirm email confirmations are off (Authentication →
+Providers → Email).
