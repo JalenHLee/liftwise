@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # Liftwise
 
 ## What we're building
@@ -78,5 +80,35 @@ Mobile-first, one-handed use, large tap targets.
 7. Progress screen
 8. Eval set (20 check-in scenarios with expected behaviors)
 
+## Decisions
+Owner-approved clarifications of the rules above. Follow these; ask before changing them.
+
+1. Yellow soreness: any muscle at soreness 3 **or higher** makes the day Yellow.
+2. Weekly set counting: 1 set for the exercise's main muscle, 0.5 for each secondary muscle.
+3. 5 days/week = Push, Pull, Legs, Upper, Lower (plain PPL would train legs only once).
+4. Equipment setups:
+   - Full gym: everything in the library.
+   - Unit gym: squat rack + barbell, smith machine, incline bench, flat bench press, dumbbells up to 20 kg, shoulder press machine, single-stack cable machine, cable row, lat pulldown. No leg press, leg extension, leg curl, calf machine or dip station.
+   - Bodyweight: no weights (see assumptions below).
+5. Weight cut after 2 bad sessions in a row: 10%, rounded down to the exercise's increment.
+6. A session is "bad" only if the **first** working set is below the bottom of the rep range.
+7. "Top of range at target RIR" means every set hit the top of the range and no set was harder than the target (logged RIR ≥ the low end of the target).
+8. Bodyweight exercises progress by raising the rep target instead of adding load.
+9. Red day: the engine gives about 50% of the sets. A technique/mobility session is deferred until the library has mobility exercises.
+10. Stacking: effects multiply but never go below 1 set per exercise. Order: deload → readiness → pain → soreness → time.
+11. Short on time: drop isolation exercises from the end first, then trim sets from the last compound backwards (min 1 set each). Rest is never cut.
+12. "Every 6th week" is counted from the last deload of any kind, so an early deload resets the count.
+13. Key lifts (for the stall trigger): back squat, bench press, deadlift, overhead press, barbell row, pull-up.
+14. Weekly hard-set bands: beginner 10–12, intermediate 12–16, **advanced 14–20**.
+
+Engine assumptions made while building slice 2 (not yet confirmed by the owner):
+- Bodyweight setup assumes a pull-up bar and a sturdy low bar or table (for rows and curls).
+- Templates aim for the bottom of each weekly band; they don't yet shorten sessions to the user's session length (the time modifier handles that on the day).
+- A muscle counts as "trained" in a session if it gets at least 1 hard set (using the counting in decision 2).
+- Unit gym: dumbbell exercises stop adding weight at 20 kg.
+- Default rest is the middle of the range (150 s compounds, 90 s isolation); time estimates assume 40 s of work per set.
+- A key lift is "stalled" when neither of the last 2 weeks beat its best from before those weeks.
+- Onboarding values: goal = strength / muscle / general (only strength changes rep ranges); energy and soreness are scored 1–5.
+
 ## Status
-Current: not started. Next: slice 1 (scaffold).
+Current: slice 2 (exercise library + rules engine) done. Next: slice 3 (Supabase auth + onboarding).
