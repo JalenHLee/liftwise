@@ -125,4 +125,8 @@ Engine assumptions made while building slice 2 (not yet confirmed by the owner):
 - Onboarding values: goal = strength / muscle / general (only strength changes rep ranges); energy and soreness are scored 1–5.
 
 ## Status
-Current: slice 2 (exercise library + rules engine) done. Next: slice 3 (Supabase auth + onboarding).
+Current: slice 3 (Supabase auth + onboarding) done. Next: slice 4 (daily check-in).
+
+Manual step needed in Supabase: run `supabase/migrations/0001_profiles_and_onboarding.sql`
+in the SQL Editor, and confirm email confirmations are off (Authentication →
+Providers → Email).
