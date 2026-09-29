@@ -53,7 +53,7 @@ Program templates (never let Claude invent programs):
 1. Onboarding: goal, days/week, session length, equipment (full gym / unit gym / bodyweight), experience, optional starting weights
 2. Today: check-in card -> "Build my session"
 3. Session: exercises with sets x reps x weight, target RIR, rest timer, inline set logging, "Adjusted" badge with reason
-4. Progress: weekly sets per muscle vs 10–20 band, trends for key lifts
+4. History: past sessions, plus weekly sets per muscle vs 10–20 band and trends for key lifts (this replaces the old separate Progress screen)
 
 Mobile-first, one-handed use, large tap targets.
 
@@ -122,10 +122,14 @@ paired with text, never color alone.
 2. Exercise library + rules engine + tests
 3. Supabase auth + onboarding
 4. Daily check-in
-5. Session generation (engine -> Claude -> validator -> UI)
-6. Set logging + progression from history
-7. Progress screen
-8. Eval set (20 check-in scenarios with expected behaviors)
+5. Session generation (engine -> Claude -> validator -> UI), plus starting weights from "weight × reps": estimate a 1-rep max with the Epley formula, round down to the exercise's increment; if the user skips starting weights, the first session is a calibration session
+6. Set logging + progression from history + end-of-workout rating and note
+7. Coach chat: Claude proposes changes to today's session, the engine validates them against the guardrails, and the user previews and accepts. Pain exclusions can never be overridden; volume never exceeds the green-day plan
+8. History dashboard (past sessions + weekly sets per muscle + key-lift trends)
+9. Eval set (20 check-in scenarios with expected behaviors)
+
+## Out of scope for now
+- Progress photos
 
 ## Decisions
 Owner-approved clarifications of the rules above. Follow these; ask before changing them.
