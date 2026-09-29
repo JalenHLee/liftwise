@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/auth/actions";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { SecondaryButton, SectionLabel, Wordmark } from "@/components/ui";
 
 const GOAL_LABELS: Record<string, string> = {
   strength: "Strength",
@@ -23,22 +25,34 @@ export default async function TodayPage() {
   if (!profile) redirect("/onboarding");
 
   return (
-    <main className="flex flex-1 flex-col px-6 py-10">
-      <div className="flex-1">
-        <p className="text-muted">Welcome back,</p>
-        <h1 className="text-4xl font-bold tracking-tight">{profile.first_name}</h1>
-        <p className="mt-2 text-muted">
-          Goal: <span className="text-foreground">{GOAL_LABELS[profile.goal] ?? profile.goal}</span>
-        </p>
-        <p className="mt-6 text-sm text-muted">Today&apos;s check-in is coming soon.</p>
+    <main className="flex flex-1 flex-col px-7 pt-10 pb-10">
+      <div className="flex items-baseline justify-between">
+        <Wordmark className="text-[26px]" />
+        <span className="label-mono">Today</span>
       </div>
-      <form action={signOut}>
-        <button
-          type="submit"
-          className="w-full rounded-2xl border border-border bg-surface py-4 text-base font-semibold text-foreground"
-        >
-          Log out
-        </button>
+
+      <div className="mt-14 mb-10">
+        <p className="text-base text-muted">Welcome back,</p>
+        <h1 className="mt-1 font-serif text-[56px] leading-none text-ink">{profile.first_name}</h1>
+      </div>
+
+      <section className="flex flex-col gap-2 border-t border-hairline py-7">
+        <SectionLabel index={1}>Goal</SectionLabel>
+        <p className="font-serif text-[30px] leading-tight">{GOAL_LABELS[profile.goal] ?? profile.goal}</p>
+      </section>
+
+      <section className="flex flex-col gap-2 border-t border-hairline py-7">
+        <SectionLabel index={2}>Check-in</SectionLabel>
+        <p className="text-base text-muted">Today&apos;s check-in is coming soon.</p>
+      </section>
+
+      <section className="flex flex-col gap-3 border-t border-hairline py-7">
+        <SectionLabel index={3}>Appearance</SectionLabel>
+        <ThemeToggle />
+      </section>
+
+      <form action={signOut} className="mt-auto pt-6">
+        <SecondaryButton type="submit">Log out</SecondaryButton>
       </form>
     </main>
   );

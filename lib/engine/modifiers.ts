@@ -16,7 +16,7 @@ export function applySoreness(exercises: PlannedExercise[], soreness: CheckIn["s
 }
 
 export const PAIN_MESSAGE =
-  "You flagged pain, so we removed every exercise that loads that area. Please get it checked by a medic/doctor. This is not medical advice.";
+  "You flagged pain, so we removed every exercise that loads that area. Please get it checked by a medic/doctor.";
 
 export type PainResult = {
   exercises: PlannedExercise[];

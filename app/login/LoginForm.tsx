@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { signIn, signUp, type AuthActionState } from "@/lib/auth/actions";
+import { ErrorText, Field, PrimaryButton } from "@/components/ui";
 
 const initialState: AuthActionState = { error: null };
 
@@ -15,17 +16,20 @@ export function LoginForm() {
   const pending = isLogin ? loginPending : signupPending;
   const action = isLogin ? loginAction : signupAction;
 
+  const tabClass = (active: boolean) =>
+    `min-h-11 text-base decoration-1 underline-offset-[10px] transition-colors ${
+      active ? "text-ink underline" : "text-muted"
+    }`;
+
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-col gap-6">
-      <div className="flex rounded-full border border-border bg-surface p-1" role="tablist">
+    <div className="mx-auto flex w-full max-w-sm flex-col gap-8">
+      <div className="flex gap-7" role="tablist">
         <button
           type="button"
           role="tab"
           aria-selected={isLogin}
           onClick={() => setMode("login")}
-          className={`flex-1 rounded-full py-3 text-sm font-semibold transition-colors ${
-            isLogin ? "bg-accent text-accent-foreground" : "text-muted"
-          }`}
+          className={tabClass(isLogin)}
         >
           Log in
         </button>
@@ -34,50 +38,28 @@ export function LoginForm() {
           role="tab"
           aria-selected={!isLogin}
           onClick={() => setMode("signup")}
-          className={`flex-1 rounded-full py-3 text-sm font-semibold transition-colors ${
-            !isLogin ? "bg-accent text-accent-foreground" : "text-muted"
-          }`}
+          className={tabClass(!isLogin)}
         >
           Sign up
         </button>
       </div>
 
-      <form key={mode} action={action} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-2">
-          <span className="text-sm text-muted">Email</span>
-          <input
-            name="email"
-            type="email"
-            required
-            autoComplete="email"
-            className="rounded-2xl border border-border bg-surface px-4 py-4 text-base text-foreground outline-none focus:border-accent"
-          />
-        </label>
-        <label className="flex flex-col gap-2">
-          <span className="text-sm text-muted">Password</span>
-          <input
-            name="password"
-            type="password"
-            required
-            minLength={isLogin ? undefined : 6}
-            autoComplete={isLogin ? "current-password" : "new-password"}
-            className="rounded-2xl border border-border bg-surface px-4 py-4 text-base text-foreground outline-none focus:border-accent"
-          />
-        </label>
+      <form key={mode} action={action} className="flex flex-col gap-7">
+        <Field label="Email" name="email" type="email" required autoComplete="email" />
+        <Field
+          label="Password"
+          name="password"
+          type="password"
+          required
+          minLength={isLogin ? undefined : 6}
+          autoComplete={isLogin ? "current-password" : "new-password"}
+        />
 
-        {state.error && (
-          <p role="alert" className="text-sm text-danger">
-            {state.error}
-          </p>
-        )}
+        {state.error && <ErrorText>{state.error}</ErrorText>}
 
-        <button
-          type="submit"
-          disabled={pending}
-          className="mt-2 rounded-2xl bg-accent py-4 text-base font-semibold text-accent-foreground disabled:opacity-60"
-        >
+        <PrimaryButton type="submit" disabled={pending} className="mt-3">
           {pending ? "Please wait…" : isLogin ? "Log in" : "Create account"}
-        </button>
+        </PrimaryButton>
       </form>
     </div>
   );

@@ -57,25 +57,58 @@ Program templates (never let Claude invent programs):
 
 Mobile-first, one-handed use, large tap targets.
 
-## Design
-- The readiness signal is the brand: today's readiness (green /
-  yellow / red) visibly shapes the screen through a subtle accent
-  color or glow, not just a status label.
-- Numbers are the hero: weights, reps and sets use big, bold,
-  confident numerals, readable mid-set.
-- Dark-first and gym-ready: high contrast, readable in a dim gym,
-  large tap targets placed in the thumb zone.
-- Calm, not hype: feels like a smart coach, not a flashy fitness app.
-  Minimal and precise, one accent color at a time.
-- Small moments of delight: satisfying feedback when logging a set,
-  subtle animation when the plan adjusts.
-- Mobile-first (design at 390px width first), one-handed use.
+## Design (light, editorial, minimal)
+Feel: chic, calm, minimal. Lots of whitespace, thin hairlines, no
+heavy borders, no shadows, no gradients.
+Themes: follows the phone's system setting; light when there's no
+preference. A System / Light / Dark toggle on the Today screen is
+remembered on the device, and an inline script in the page head
+applies it before first paint (no flash of the wrong theme).
+Colours are named tokens in `app/globals.css` (paper, ink, muted,
+hairline, fill, accent, green/yellow/red tint/text/dot); both themes
+use the same names.
+Light colours:
+- Paper background #F6F4EF, ink text #1C1B19, muted text #6B675F
+- Hairlines #DAD5CB, subtle fill #ECE8E0, accent terracotta #A6532F
+  (used sparingly: logo "wise", "NOW" markers)
+- Readiness cards (soft tint background / text / dot):
+  Green #E3EAE1 / #2F5A3C / #3F7A52
+  Yellow #F4EAD2 / #6E5210 / #C9962B
+  Red #F3DEDA / #8E2F24 / #B8453A
+Dark colours:
+- Background #141311, text #EDE9E1, muted text #9A958B
+- Hairlines #2E2B27, subtle fill #1F1D1A, accent terracotta #D07A55
+- Selected pills and the primary button invert: #EDE9E1 fill with
+  #141311 text
+- Readiness cards (tint background / text / dot):
+  Green #1E2A21 / #A8CDB0 / #5FA374
+  Yellow #2E2718 / #E6C47A / #D6A640
+  Red #2F1D1A / #E8A79C / #D0645A
+Type (load with next/font/google so fonts are bundled at build):
+- Instrument Serif: headlines and all big numbers; italic for accents
+- Instrument Sans: body text and buttons (400/500)
+- JetBrains Mono: small labels, 10.5px, UPPERCASE, 0.14em letter
+  spacing, muted color
+Shapes and components (shared pieces live in `components/ui.tsx`):
+- 1px hairline dividers between sections; sections labeled like
+  "01  SLEEP" in mono
+- Buttons, chips, segmented choices: pills (fully rounded).
+  Selected = solid ink fill with paper text. Unselected = 1px
+  hairline outline.
+- Primary button: ink pill, 54px tall, paper text, label left and a
+  thin arrow icon right
+- Rows 14px radius, cards 20px radius
+- Inputs: no box, just a 1px hairline underline, mono label above
+- Page side padding 28px; touch targets at least 44px
+Readiness: a soft tinted card with a small colored dot and a serif
+label ("Yellow day"), never a saturated full-width block. Always
+paired with text, never color alone.
 
 ## Data (Supabase)
 `profiles`, `exercises` (static seed, ~40), `checkins`, `sessions`, `set_logs`. RLS: users only see their own rows.
 
 ## Safety
-- "Not medical advice" note on onboarding and in the pain flow
+- Pain flow tells the user to get it checked by a medic/doctor (never diagnose). No "not medical advice" notes elsewhere in the app.
 - Secrets only in env vars, never in code: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `ANTHROPIC_API_KEY`
 
 ## How to work with me
@@ -125,7 +158,7 @@ Engine assumptions made while building slice 2 (not yet confirmed by the owner):
 - Onboarding values: goal = strength / muscle / general (only strength changes rep ranges); energy and soreness are scored 1–5.
 
 ## Status
-Current: slice 3 (Supabase auth + onboarding) done. Next: slice 4 (daily check-in).
+Current: slice 3 (Supabase auth + onboarding) done, plus a visual redesign (light editorial design with a matching dark theme) of login, onboarding and Today. Next: slice 4 (daily check-in).
 
 Manual step needed in Supabase: run `supabase/migrations/0001_profiles_and_onboarding.sql`
 in the SQL Editor, and confirm email confirmations are off (Authentication →

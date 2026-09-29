@@ -54,7 +54,7 @@ describe("pain modifier", () => {
     const { message } = applyPain(session, ["knee"]);
     expect(message).toBe(PAIN_MESSAGE);
     expect(message).toContain("get it checked by a medic/doctor");
-    expect(message).toContain("not medical advice");
+    expect(message).not.toContain("not medical advice");
     expect(message).not.toMatch(/injur|strain|sprain|tear|tendin|diagnos/i);
   });
 
