@@ -15,6 +15,21 @@ const checkIn = (overrides: Partial<CheckIn> = {}): CheckIn => ({
 
 const level = (overrides: Partial<CheckIn>) => scoreReadiness(checkIn(overrides)).level;
 
+describe("readiness tags", () => {
+  test("green days have no tags", () => {
+    expect(scoreReadiness(checkIn()).tags).toEqual([]);
+  });
+
+  test("tags name each trigger in short form", () => {
+    const result = scoreReadiness(checkIn({ sleepHours: 5.5, energy: 2, soreness: { quads: 3, chest: 2, back: 5 } }));
+    expect(result.tags).toEqual(["5.5h sleep", "energy 2/5", "sore back", "sore quads"]);
+  });
+
+  test("whole hours drop the decimal", () => {
+    expect(scoreReadiness(checkIn({ sleepHours: 5 })).tags).toEqual(["5h sleep"]);
+  });
+});
+
 describe("readiness scoring", () => {
   test("green: good sleep, good energy, little soreness → plan as written, progression allowed", () => {
     const result = scoreReadiness(checkIn());

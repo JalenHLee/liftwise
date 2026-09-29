@@ -27,15 +27,24 @@ function ArrowIcon() {
   );
 }
 
-/** Ink pill, 54px tall: label on the left, thin arrow on the right. */
-export function PrimaryButton({ children, className = "", ...props }: ComponentProps<"button">) {
+/** Ink pill, 54px tall: label on the left, thin arrow on the right (or a small mono `hint`, e.g. "Coming soon"). */
+export function PrimaryButton({
+  children,
+  hint,
+  className = "",
+  ...props
+}: ComponentProps<"button"> & { hint?: ReactNode }) {
   return (
     <button
       {...props}
-      className={`flex h-[54px] w-full items-center justify-between rounded-full bg-ink px-7 text-base font-medium text-paper transition-opacity disabled:opacity-50 ${className}`}
+      className={`flex h-[54px] w-full items-center justify-between rounded-full bg-ink px-7 text-base font-medium text-paper transition-opacity disabled:opacity-60 ${className}`}
     >
       <span>{children}</span>
-      <ArrowIcon />
+      {hint ? (
+        <span className="font-mono text-[10.5px] uppercase tracking-[0.14em]">{hint}</span>
+      ) : (
+        <ArrowIcon />
+      )}
     </button>
   );
 }
@@ -115,5 +124,42 @@ export function ErrorText({ children }: { children: ReactNode }) {
     <p role="alert" className="text-sm text-red-text">
       {children}
     </p>
+  );
+}
+
+const READINESS_STYLES = {
+  green: { card: "bg-green-tint text-green-text", dot: "bg-green-dot" },
+  yellow: { card: "bg-yellow-tint text-yellow-text", dot: "bg-yellow-dot" },
+  red: { card: "bg-red-tint text-red-text", dot: "bg-red-dot" },
+} as const;
+
+/**
+ * Soft tinted card: a small dot, a serif label ("Yellow day"), one line of explanation and the
+ * reasons in mono. Always words as well as colour.
+ */
+export function ReadinessCard({
+  level,
+  label,
+  line,
+  tags,
+}: {
+  level: keyof typeof READINESS_STYLES;
+  label: string;
+  line: string;
+  /** Short reasons, e.g. ["5.5h sleep", "sore quads"]; shown uppercase, joined with " · ". */
+  tags: readonly string[];
+}) {
+  const style = READINESS_STYLES[level];
+  return (
+    <div role="status" className={`rounded-card px-6 py-6 ${style.card}`}>
+      <div className="flex items-center gap-2.5">
+        <span aria-hidden="true" className={`size-2 rounded-full ${style.dot}`} />
+        <span className="font-serif text-[32px] leading-none">{label}</span>
+      </div>
+      <p className="mt-3 text-[15px] leading-snug">{line}</p>
+      <p className="mt-4 font-mono text-[10.5px] uppercase leading-relaxed tracking-[0.14em] opacity-80">
+        {tags.length > 0 ? tags.join(" · ") : "No flags today"}
+      </p>
+    </div>
   );
 }

@@ -2,13 +2,10 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/lib/auth/actions";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { SecondaryButton, SectionLabel, Wordmark } from "@/components/ui";
-
-const GOAL_LABELS: Record<string, string> = {
-  strength: "Strength",
-  muscle: "Muscle",
-  general: "General fitness",
-};
+import { SecondaryButton, SectionLabel } from "@/components/ui";
+import { lookbackDate } from "@/lib/checkin/logic";
+import type { CheckinRow } from "@/lib/checkin/save";
+import { CheckinScreen } from "./CheckinScreen";
 
 export default async function TodayPage() {
   const supabase = await createClient();
@@ -19,39 +16,30 @@ export default async function TodayPage() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("first_name, goal")
+    .select("session_minutes")
     .eq("user_id", user.id)
     .maybeSingle();
   if (!profile) redirect("/onboarding");
 
+  // The user's local "today" is within a day of the UTC date, so fetch that window and let the
+  // device pick the row that matches its own date.
+  const since = lookbackDate(new Date());
+  const { data: recent } = await supabase
+    .from("checkins")
+    .select("checkin_date, sleep_hours, energy, soreness, pain_areas, minutes_available, note, readiness_level, readiness_reasons")
+    .eq("user_id", user.id)
+    .gte("checkin_date", since);
+
   return (
     <main className="flex flex-1 flex-col px-7 pt-10 pb-10">
-      <div className="flex items-baseline justify-between">
-        <Wordmark className="text-[26px]" />
-        <span className="label-mono">Today</span>
-      </div>
+      <CheckinScreen sessionMinutes={profile.session_minutes} recent={(recent ?? []) as CheckinRow[]} />
 
-      <div className="mt-14 mb-10">
-        <p className="text-base text-muted">Welcome back,</p>
-        <h1 className="mt-1 font-serif text-[56px] leading-none text-ink">{profile.first_name}</h1>
-      </div>
-
-      <section className="flex flex-col gap-2 border-t border-hairline py-7">
-        <SectionLabel index={1}>Goal</SectionLabel>
-        <p className="font-serif text-[30px] leading-tight">{GOAL_LABELS[profile.goal] ?? profile.goal}</p>
-      </section>
-
-      <section className="flex flex-col gap-2 border-t border-hairline py-7">
-        <SectionLabel index={2}>Check-in</SectionLabel>
-        <p className="text-base text-muted">Today&apos;s check-in is coming soon.</p>
-      </section>
-
-      <section className="flex flex-col gap-3 border-t border-hairline py-7">
-        <SectionLabel index={3}>Appearance</SectionLabel>
+      <section className="mt-10 flex flex-col gap-3 border-t border-hairline py-7">
+        <SectionLabel>Appearance</SectionLabel>
         <ThemeToggle />
       </section>
 
-      <form action={signOut} className="mt-auto pt-6">
+      <form action={signOut} className="pt-2">
         <SecondaryButton type="submit">Log out</SecondaryButton>
       </form>
     </main>

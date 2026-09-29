@@ -162,8 +162,8 @@ Engine assumptions made while building slice 2 (not yet confirmed by the owner):
 - Onboarding values: goal = strength / muscle / general (only strength changes rep ranges); energy and soreness are scored 1–5.
 
 ## Status
-Current: slice 3 (Supabase auth + onboarding) done, plus a visual redesign (light editorial design with a matching dark theme) of login, onboarding and Today. Next: slice 4 (daily check-in).
+Current: slice 4 (daily check-in) done. The Today screen is now the check-in: sleep, energy, soreness, pain, time and an optional note, with a live readiness card (scored by the engine). Check-ins are saved once per user per local day (saving again the same day updates it, including the readiness snapshot). "Build my session" is shown but disabled until slice 5. Next: slice 5 (session generation + starting weights from "weight × reps").
 
-Manual step needed in Supabase: run `supabase/migrations/0001_profiles_and_onboarding.sql`
-in the SQL Editor, and confirm email confirmations are off (Authentication →
-Providers → Email).
+Manual steps needed in Supabase (SQL Editor), in order:
+1. `supabase/migrations/0001_profiles_and_onboarding.sql` (if not already run), and confirm email confirmations are off (Authentication → Providers → Email).
+2. `supabase/migrations/0002_checkins.sql` (the `checkins` table with Row Level Security).
