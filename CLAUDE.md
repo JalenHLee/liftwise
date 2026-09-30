@@ -111,6 +111,9 @@ paired with text, never color alone.
 - Pain flow tells the user to get it checked by a medic/doctor (never diagnose). No "not medical advice" notes elsewhere in the app.
 - Secrets only in env vars, never in code: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `ANTHROPIC_API_KEY`
 
+## Working rules
+- Never use `pgrep -f` or `pkill -f` with a pattern that appears in the same command (it matches itself and hangs or kills the shell). Run installs and builds in the foreground and wait for them to finish.
+
 ## How to work with me
 - Read this file first. Propose a short plan and wait for approval before coding.
 - One slice per session. Do not add features I didn't ask for.
@@ -151,6 +154,8 @@ Owner-approved clarifications of the rules above. Follow these; ask before chang
 12. "Every 6th week" is counted from the last deload of any kind, so an early deload resets the count.
 13. Key lifts (for the stall trigger): back squat, bench press, deadlift, overhead press, barbell row, pull-up.
 14. Weekly hard-set bands: beginner 10–12, intermediate 12–16, **advanced 14–20**.
+15. Starting loads: estimate a 1-rep max from the user's last solid set (Epley: weight × (1 + reps/30); 1 rep = the weight itself), then work backwards using the **top** of the exercise's rep range plus its low-end target RIR (e.g. 5–10 at RIR 2 → 10 + 2 = 12), rounded **down** to the exercise's increment, never below one increment. Starting slightly light is intended; double progression corrects it within a session. No starting data (or a bodyweight exercise) → calibration: "Pick a weight you could lift for about 10 reps with 2 left in reserve."
+16. Onboarding starting sets are "weight × reps", reps 1–12, both boxes or neither. Above 10 reps the form says the estimate is less precise. Rows saved before slice 5a have no reps; the session builder (5b) treats them as 5 reps.
 
 Engine assumptions made while building slice 2 (not yet confirmed by the owner):
 - Bodyweight setup assumes a pull-up bar and a sturdy low bar or table (for rows and curls).
@@ -162,8 +167,9 @@ Engine assumptions made while building slice 2 (not yet confirmed by the owner):
 - Onboarding values: goal = strength / muscle / general (only strength changes rep ranges); energy and soreness are scored 1–5.
 
 ## Status
-Current: slice 4 (daily check-in) done. The Today screen is now the check-in: sleep, energy, soreness, pain, time and an optional note, with a live readiness card (scored by the engine). Check-ins are saved once per user per local day (saving again the same day updates it, including the readiness snapshot). "Build my session" is shown but disabled until slice 5. Next: slice 5 (session generation + starting weights from "weight × reps").
+Current: slice 5a (starting weights) done. Onboarding now asks for "your last solid set" (weight × reps, reps 1–12, optional per lift) and saves the reps. The engine has `estimateOneRepMax`, `startingLoad` and `startingLoadFor` (in `lib/engine/startingLoad.ts`, fully tested), which give a starting weight or a calibration marker. Nothing uses them yet. Next: slice 5b (session builder: engine -> Claude -> validator -> UI), which will call `startingLoadFor`. It will also apply the unit-gym dumbbell cap, since 5a's key lifts don't use dumbbells.
 
 Manual steps needed in Supabase (SQL Editor), in order:
 1. `supabase/migrations/0001_profiles_and_onboarding.sql` (if not already run), and confirm email confirmations are off (Authentication → Providers → Email).
 2. `supabase/migrations/0002_checkins.sql` (the `checkins` table with Row Level Security).
+3. `supabase/migrations/0003_starting_weights_reps.sql` (adds the `reps` column to `starting_weights`; run it before testing the onboarding preview).

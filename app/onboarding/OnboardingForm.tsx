@@ -7,8 +7,11 @@ import { weightedKeyLiftsFor } from "@/lib/onboarding/keyLifts";
 import {
   DAYS_PER_WEEK_OPTIONS,
   SESSION_MINUTES_OPTIONS,
+  PRECISE_STARTING_REPS,
   isValid,
+  parseStartingSets,
   validateOnboarding,
+  type StartingSetDraft,
   type OnboardingErrors,
 } from "@/lib/onboarding/validation";
 import { ErrorText, PillGroup, PrimaryButton, SectionLabel } from "@/components/ui";
@@ -43,7 +46,7 @@ export function OnboardingForm() {
   const [sessionMinutes, setSessionMinutes] = useState<number>(60);
   const [equipment, setEquipment] = useState<EquipmentSetup>("full_gym");
   const [experience, setExperience] = useState<Experience>("beginner");
-  const [weights, setWeights] = useState<Record<string, string>>({});
+  const [weights, setWeights] = useState<Record<string, StartingSetDraft>>({});
   const [errors, setErrors] = useState<OnboardingErrors>({});
   const [isPending, startTransition] = useTransition();
 
@@ -52,12 +55,14 @@ export function OnboardingForm() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    const startingWeights: Record<string, number> = {};
+    const drafts: Record<string, StartingSetDraft> = {};
     for (const lift of keyLifts) {
-      const raw = weights[lift.id];
-      if (raw !== undefined && raw.trim() !== "") {
-        startingWeights[lift.id] = Number(raw);
-      }
+      if (weights[lift.id]) drafts[lift.id] = weights[lift.id];
+    }
+    const { sets: startingWeights, error: startingError } = parseStartingSets(drafts);
+    if (startingError) {
+      setErrors({ startingWeights: startingError });
+      return;
     }
 
     const input = { firstName, goal, daysPerWeek, sessionMinutes, equipment, experience, startingWeights };
@@ -130,27 +135,49 @@ export function OnboardingForm() {
       {keyLifts.length > 0 && (
         <Section index={7} label="Starting weights · optional" question="Know your working weights?">
           <p className="-mt-1 text-sm text-muted">
-            Fill in what you know and skip the rest. We&apos;ll work it out from your first sessions.
+            Your last solid set on each lift, if you remember it. Skip any you don&apos;t and we&apos;ll help you
+            find the weight in your first session.
           </p>
           <div className="flex flex-col gap-2">
-            {keyLifts.map((lift) => (
-              <label
-                key={lift.id}
-                className="flex min-h-16 items-center justify-between gap-4 rounded-row bg-fill pr-4 pl-5"
-              >
-                <span className="text-base">{lift.name}</span>
-                <span className="flex items-baseline gap-2">
-                  <input
-                    inputMode="decimal"
-                    value={weights[lift.id] ?? ""}
-                    onChange={(e) => setWeights((prev) => ({ ...prev, [lift.id]: e.target.value }))}
-                    placeholder="—"
-                    className="min-h-11 w-20 border-0 border-b border-hairline bg-transparent text-right font-serif text-[28px] leading-none text-ink outline-none placeholder:text-muted/60 focus:border-ink"
-                  />
-                  <span className="label-mono">kg</span>
-                </span>
-              </label>
-            ))}
+            {keyLifts.map((lift) => {
+              const draft = weights[lift.id] ?? { weight: "", reps: "" };
+              const update = (patch: Partial<StartingSetDraft>) =>
+                setWeights((prev) => ({ ...prev, [lift.id]: { ...draft, ...patch } }));
+              const lessPrecise = Number(draft.reps) > PRECISE_STARTING_REPS;
+              return (
+                <fieldset key={lift.id} className="flex flex-col rounded-row bg-fill px-5 py-4">
+                  <legend className="sr-only">{lift.name}</legend>
+                  <span aria-hidden className="text-base">
+                    {lift.name}
+                  </span>
+                  <span className="label-mono mt-1">Your last solid set</span>
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <input
+                      aria-label={`${lift.name} weight in kilograms`}
+                      inputMode="decimal"
+                      value={draft.weight}
+                      onChange={(e) => update({ weight: e.target.value })}
+                      placeholder="—"
+                      className="min-h-11 w-20 border-0 border-b border-hairline bg-transparent text-right font-serif text-[28px] leading-none text-ink outline-none placeholder:text-muted/60 focus:border-ink"
+                    />
+                    <span className="label-mono">kg</span>
+                    <span className="px-1 font-serif text-[22px] leading-none text-muted">×</span>
+                    <input
+                      aria-label={`${lift.name} reps`}
+                      inputMode="numeric"
+                      value={draft.reps}
+                      onChange={(e) => update({ reps: e.target.value })}
+                      placeholder="—"
+                      className="min-h-11 w-14 border-0 border-b border-hairline bg-transparent text-right font-serif text-[28px] leading-none text-ink outline-none placeholder:text-muted/60 focus:border-ink"
+                    />
+                    <span className="label-mono">reps</span>
+                  </div>
+                  {lessPrecise && (
+                    <p className="mt-1 text-sm text-muted">Above {PRECISE_STARTING_REPS} reps the estimate is less precise.</p>
+                  )}
+                </fieldset>
+              );
+            })}
           </div>
           {errors.startingWeights && <ErrorText>{errors.startingWeights}</ErrorText>}
         </Section>

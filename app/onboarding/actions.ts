@@ -35,10 +35,11 @@ export async function saveOnboarding(input: OnboardingInput): Promise<{ errors: 
     return { errors: { form: profileError.message } };
   }
 
-  const weightRows = Object.entries(input.startingWeights).map(([exerciseId, weightKg]) => ({
+  const weightRows = Object.entries(input.startingWeights).map(([exerciseId, set]) => ({
     user_id: user.id,
     exercise_id: exerciseId,
-    weight_kg: weightKg,
+    weight_kg: set.weightKg,
+    reps: set.reps,
   }));
 
   if (weightRows.length > 0) {

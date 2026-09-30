@@ -92,7 +92,8 @@ describe("check-in screen", () => {
     render(<CheckinScreen sessionMinutes={60} recent={[]} />);
     fireEvent.click(screen.getByRole("button", { name: "Save check-in" }));
     await waitFor(() => expect(screen.getByRole("alert").textContent).toBe("boom"));
-    expect(screen.getByRole("button", { name: "Save check-in" })).toBeTruthy();
+    // The error shows while the button still says "Saving…"; wait for it to settle.
+    await waitFor(() => expect(screen.getByRole("button", { name: "Save check-in" })).toBeTruthy());
   });
 
   test("coming back the same day shows the saved check-in and its snapshot, with an edit option", () => {
