@@ -111,6 +111,9 @@ paired with text, never color alone.
 - Pain flow tells the user to get it checked by a medic/doctor (never diagnose). No "not medical advice" notes elsewhere in the app.
 - Secrets only in env vars, never in code: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `ANTHROPIC_API_KEY`
 
+## Working rules
+- Never use `pgrep -f` or `pkill -f` with a pattern that appears in the same command (it matches itself and hangs or kills the shell). Run installs and builds in the foreground and wait for them to finish.
+
 ## How to work with me
 - Read this file first. Propose a short plan and wait for approval before coding.
 - One slice per session. Do not add features I didn't ask for.
