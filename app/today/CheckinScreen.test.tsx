@@ -7,12 +7,18 @@ import { CheckinScreen } from "./CheckinScreen";
 
 const saveCheckin = vi.fn();
 vi.mock("./actions", () => ({ saveCheckin: (...args: unknown[]) => saveCheckin(...args) }));
+const buildSession = vi.fn();
+vi.mock("@/app/session/actions", () => ({ buildSession: (...args: unknown[]) => buildSession(...args) }));
+const push = vi.fn();
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(new Date(2026, 8, 29, 9, 0)); // 29 Sep 2026, local time
   window.scrollTo = vi.fn();
   saveCheckin.mockReset();
+  buildSession.mockReset();
+  push.mockReset();
 });
 afterEach(() => {
   cleanup();
@@ -23,14 +29,14 @@ const chip = (name: string) => screen.getByRole("button", { name: new RegExp(`^$
 
 describe("check-in screen", () => {
   test("starts on a green day with the profile's session length", () => {
-    render(<CheckinScreen sessionMinutes={45} recent={[]} />);
+    render(<CheckinScreen sessionMinutes={45} recent={[]} sessionDates={[]} />);
     expect(screen.getByText("Green day")).toBeTruthy();
     expect(screen.getByText("Tue 29 Sep")).toBeTruthy();
     expect(screen.getByRole("radio", { name: "45", checked: true })).toBeTruthy();
   });
 
   test("tapping a muscle cycles its soreness and the readiness card follows", () => {
-    render(<CheckinScreen sessionMinutes={60} recent={[]} />);
+    render(<CheckinScreen sessionMinutes={60} recent={[]} sessionDates={[]} />);
     const quads = () => chip("Quads");
 
     fireEvent.click(quads());
@@ -52,7 +58,7 @@ describe("check-in screen", () => {
   });
 
   test("less sleep turns the card yellow and lists the hours as a reason", () => {
-    render(<CheckinScreen sessionMinutes={60} recent={[]} />);
+    render(<CheckinScreen sessionMinutes={60} recent={[]} sessionDates={[]} />);
     for (let i = 0; i < 3; i++) fireEvent.click(screen.getByRole("button", { name: "Half an hour less" }));
     expect(screen.getByText("5.5")).toBeTruthy();
     expect(screen.getByText("Yellow day")).toBeTruthy();
@@ -60,7 +66,7 @@ describe("check-in screen", () => {
   });
 
   test("pain: Yes shows the areas and the doctor message; No hides them", () => {
-    render(<CheckinScreen sessionMinutes={60} recent={[]} />);
+    render(<CheckinScreen sessionMinutes={60} recent={[]} sessionDates={[]} />);
     expect(screen.queryByText(/get it checked by a medic\/doctor/)).toBeNull();
     fireEvent.click(screen.getByRole("radio", { name: "Yes" }));
     expect(screen.getByRole("button", { name: "Lower back" })).toBeTruthy();
@@ -69,18 +75,55 @@ describe("check-in screen", () => {
     expect(screen.queryByRole("button", { name: "Lower back" })).toBeNull();
   });
 
-  test("Build my session is visible but disabled", () => {
-    render(<CheckinScreen sessionMinutes={60} recent={[]} />);
-    const build = screen.getByRole("button", { name: /Build my session/ }) as HTMLButtonElement;
-    expect(build.disabled).toBe(true);
-    expect(build.textContent).toMatch(/coming soon/i);
+  test("before saving, the only primary button is Save check-in", () => {
+    render(<CheckinScreen sessionMinutes={60} recent={[]} sessionDates={[]} />);
+    expect(screen.getByRole("button", { name: "Save check-in" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /Build my session/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: /View today/ })).toBeNull();
+  });
+
+  test("after saving, Build my session shows a calm loading state, then opens the session", async () => {
+    const row = formToRow("2026-09-29", defaultForm(60));
+    let finish: (v: unknown) => void = () => {};
+    buildSession.mockImplementation(() => new Promise((resolve) => (finish = resolve)));
+    render(<CheckinScreen sessionMinutes={60} recent={[row]} sessionDates={[]} />);
+    expect(screen.queryByRole("button", { name: "Save check-in" })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: /Build my session/ }));
+    expect(buildSession).toHaveBeenCalledWith({ date: "2026-09-29" });
+    await waitFor(() => expect(screen.getByText("Building your session…")).toBeTruthy());
+    expect(screen.queryByRole("button", { name: /Build my session/ })).toBeNull();
+
+    finish({ built: { date: "2026-09-29", source: "ai", buildsLeft: 3 } });
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/session?date=2026-09-29"));
+  });
+
+  test("a build error is shown and the button comes back", async () => {
+    buildSession.mockResolvedValue({ error: "Save today's check-in first." });
+    render(<CheckinScreen sessionMinutes={60} recent={[formToRow("2026-09-29", defaultForm(60))]} sessionDates={[]} />);
+    fireEvent.click(screen.getByRole("button", { name: /Build my session/ }));
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toBe("Save today's check-in first."));
+    await waitFor(() => expect(screen.getByRole("button", { name: /Build my session/ })).toBeTruthy());
+    expect(push).not.toHaveBeenCalled();
+  });
+
+  test("once today's session is built, the primary is View today's session", () => {
+    render(<CheckinScreen sessionMinutes={60} recent={[formToRow("2026-09-29", defaultForm(60))]} sessionDates={["2026-09-29"]} />);
+    expect(screen.queryByRole("button", { name: /Build my session/ })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "View today's session" }));
+    expect(push).toHaveBeenCalledWith("/session?date=2026-09-29");
+  });
+
+  test("a session from another day doesn't count as today's", () => {
+    render(<CheckinScreen sessionMinutes={60} recent={[formToRow("2026-09-29", defaultForm(60))]} sessionDates={["2026-09-28"]} />);
+    expect(screen.getByRole("button", { name: /Build my session/ })).toBeTruthy();
   });
 
   test("saving sends today's local date and then shows the saved result", async () => {
     saveCheckin.mockImplementation(async ({ date, form }) => ({
       saved: { date, form, readiness: { level: "green", tags: [] } },
     }));
-    render(<CheckinScreen sessionMinutes={60} recent={[]} />);
+    render(<CheckinScreen sessionMinutes={60} recent={[]} sessionDates={[]} />);
     fireEvent.click(screen.getByRole("button", { name: "Save check-in" }));
 
     await waitFor(() => expect(screen.getByRole("button", { name: "Edit check-in" })).toBeTruthy());
@@ -89,7 +132,7 @@ describe("check-in screen", () => {
 
   test("shows an error if saving fails and stays on the form", async () => {
     saveCheckin.mockResolvedValue({ error: "boom" });
-    render(<CheckinScreen sessionMinutes={60} recent={[]} />);
+    render(<CheckinScreen sessionMinutes={60} recent={[]} sessionDates={[]} />);
     fireEvent.click(screen.getByRole("button", { name: "Save check-in" }));
     await waitFor(() => expect(screen.getByRole("alert").textContent).toBe("boom"));
     // The error shows while the button still says "Saving…"; wait for it to settle.
@@ -98,7 +141,7 @@ describe("check-in screen", () => {
 
   test("coming back the same day shows the saved check-in and its snapshot, with an edit option", () => {
     const row = { ...formToRow("2026-09-29", { ...defaultForm(60), sleepHours: 5.5, soreness: { quads: 3 } }), readiness_reasons: ["saved reason"] };
-    render(<CheckinScreen sessionMinutes={60} recent={[row]} />);
+    render(<CheckinScreen sessionMinutes={60} recent={[row]} sessionDates={[]} />);
     expect(screen.getByText("Yellow day")).toBeTruthy();
     expect(screen.getByText("saved reason")).toBeTruthy();
     expect(screen.getByText("Quads 3")).toBeTruthy();
@@ -111,7 +154,7 @@ describe("check-in screen", () => {
 
   test("a check-in from another day doesn't count as today's", () => {
     const row = formToRow("2026-09-28", defaultForm(60));
-    render(<CheckinScreen sessionMinutes={60} recent={[row]} />);
+    render(<CheckinScreen sessionMinutes={60} recent={[row]} sessionDates={[]} />);
     expect(screen.getByRole("button", { name: "Save check-in" })).toBeTruthy();
   });
 });
