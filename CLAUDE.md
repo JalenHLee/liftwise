@@ -130,6 +130,7 @@ paired with text, never color alone.
 7. Coach chat: Claude proposes changes to today's session, the engine validates them against the guardrails, and the user previews and accepts. Pain exclusions can never be overridden; volume never exceeds the green-day plan
 8. History dashboard (past sessions + weekly sets per muscle + key-lift trends)
 9. Eval set (20 check-in scenarios with expected behaviors)
+10. Launch kit: installable PWA; Korean language support (UI and AI explanations); PostHog analytics events; in-app feedback button and thumbs up/down on AI explanations; privacy notice with account deletion; per-user daily limit on AI calls; a "Liftwise Pro" fake door test
 
 ## Out of scope for now
 - Progress photos
