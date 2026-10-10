@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useMemo, useState, useSyncExternalStore, useTransition } from "react";
 import { PAIN_MESSAGE } from "@/lib/engine/modifiers";
 import { MUSCLES, PAIN_AREAS } from "@/lib/engine/types";
@@ -24,7 +25,8 @@ import {
 } from "@/lib/checkin/logic";
 import { rowToSaved, type CheckinRow } from "@/lib/checkin/save";
 import { SESSION_MINUTES_OPTIONS } from "@/lib/onboarding/validation";
-import { ErrorText, Field, PillGroup, PrimaryButton, ReadinessCard, SecondaryButton, SectionLabel } from "@/components/ui";
+import { ErrorText, Field, PillGroup, PrimaryButton, ReadinessCard, SecondaryButton, SectionLabel, WorkingState } from "@/components/ui";
+import { buildSession } from "@/app/session/actions";
 import { saveCheckin } from "./actions";
 
 const noopSubscribe = () => () => {};
@@ -106,7 +108,17 @@ function Summary({ saved }: { saved: SavedCheckin }) {
   );
 }
 
-export function CheckinScreen({ sessionMinutes, recent }: { sessionMinutes: number; recent: CheckinRow[] }) {
+export function CheckinScreen({
+  sessionMinutes,
+  recent,
+  sessionDates,
+}: {
+  sessionMinutes: number;
+  recent: CheckinRow[];
+  /** Local dates that already have a built session. */
+  sessionDates: string[];
+}) {
+  const router = useRouter();
   // The server can't know the user's local date, so it is read on the device after load.
   const today = useSyncExternalStore(noopSubscribe, () => localDateString(new Date()), () => null);
 
@@ -115,10 +127,13 @@ export function CheckinScreen({ sessionMinutes, recent }: { sessionMinutes: numb
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isBuilding, startBuilding] = useTransition();
 
   const fromServer = useMemo(() => recent.map(rowToSaved).find((c) => c?.date === today) ?? null, [recent, today]);
   const saved = justSaved?.date === today ? justSaved : fromServer;
   const showForm = !saved || editing;
+  const sessionHref = today ? `/session?date=${today}` : "/today";
+  const hasSession = today !== null && sessionDates.includes(today);
 
   const live = useMemo(() => readinessDisplay(snapshotReadiness(form)), [form]);
 
@@ -138,6 +153,19 @@ export function CheckinScreen({ sessionMinutes, recent }: { sessionMinutes: numb
       setJustSaved(result.saved);
       setEditing(false);
       window.scrollTo({ top: 0 });
+    });
+  }
+
+  function build() {
+    if (today === null) return;
+    setError(null);
+    startBuilding(async () => {
+      const result = await buildSession({ date: today });
+      if ("error" in result) {
+        setError(result.error);
+        return;
+      }
+      router.push(sessionHref);
     });
   }
 
@@ -266,24 +294,38 @@ export function CheckinScreen({ sessionMinutes, recent }: { sessionMinutes: numb
           saved && <ReadinessCard {...readinessDisplay(saved.readiness)} />
         )}
 
-        {showForm && error && <ErrorText>{error}</ErrorText>}
+        {error && <ErrorText>{error}</ErrorText>}
 
         {showForm ? (
-          <PrimaryButton type="button" onClick={submit} disabled={isPending} className="mt-3">
-            {isPending ? "Saving…" : saved ? "Update check-in" : "Save check-in"}
-          </PrimaryButton>
+          <>
+            <PrimaryButton type="button" onClick={submit} disabled={isPending} className="mt-3">
+              {isPending ? "Saving…" : saved ? "Update check-in" : "Save check-in"}
+            </PrimaryButton>
+            {saved && (
+              <SecondaryButton type="button" onClick={() => setEditing(false)}>
+                Cancel
+              </SecondaryButton>
+            )}
+          </>
+        ) : isBuilding ? (
+          <div className="mt-3">
+            <WorkingState hint="A few seconds">Building your session…</WorkingState>
+          </div>
         ) : (
-          <SecondaryButton type="button" onClick={startEditing} className="mt-3">
-            Edit check-in
-          </SecondaryButton>
-        )}
-        <PrimaryButton type="button" disabled hint="Coming soon">
-          Build my session
-        </PrimaryButton>
-        {showForm && saved && (
-          <SecondaryButton type="button" onClick={() => setEditing(false)}>
-            Cancel
-          </SecondaryButton>
+          <>
+            {hasSession ? (
+              <PrimaryButton type="button" onClick={() => router.push(sessionHref)} className="mt-3">
+                View today&apos;s session
+              </PrimaryButton>
+            ) : (
+              <PrimaryButton type="button" onClick={build} className="mt-3">
+                Build my session
+              </PrimaryButton>
+            )}
+            <SecondaryButton type="button" onClick={startEditing}>
+              Edit check-in
+            </SecondaryButton>
+          </>
         )}
       </div>
     </>

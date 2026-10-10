@@ -163,3 +163,16 @@ export function ReadinessCard({
     </div>
   );
 }
+
+/** Calm in-progress state that takes the place of a button while slow work runs, e.g. "Building your session…". */
+export function WorkingState({ children, hint }: { children: ReactNode; hint?: ReactNode }) {
+  return (
+    <div role="status" aria-live="polite" className="flex h-[54px] w-full items-center justify-between rounded-full border border-hairline px-7 text-base text-ink">
+      <span className="flex items-center gap-3">
+        <span aria-hidden="true" className="size-2 animate-pulse rounded-full bg-accent motion-reduce:animate-none" />
+        {children}
+      </span>
+      {hint && <span className="font-mono text-[10.5px] uppercase tracking-[0.14em] text-muted">{hint}</span>}
+    </div>
+  );
+}
