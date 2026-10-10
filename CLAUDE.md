@@ -5,6 +5,10 @@
 ## What we're building
 Liftwise is an AI fitness coach: a mobile-first web app. Each day the user does a 30-second check-in (sleep, energy, soreness, pain, time available). The app adapts that day's workout using evidence-based rules, explains every change, logs sets, and progresses load over time.
 
+Positioning: "Liftwise adapts your program to today. Bring your own, or start with ours." Two segments:
+- Beginners: want guidance, so they start from one of our programs.
+- Advanced lifters: already have a program and want it adapted to how they feel each day.
+
 The owner is a product manager, not an engineer. Explain every change in plain English and prefer simple solutions.
 
 ## Stack
@@ -126,11 +130,13 @@ paired with text, never color alone.
 3. Supabase auth + onboarding
 4. Daily check-in
 5. Session generation (engine -> Claude -> validator -> UI), plus starting weights from "weight × reps": estimate a 1-rep max with the Epley formula, round down to the exercise's increment; if the user skips starting weights, the first session is a calibration session
-6. Set logging + progression from history + end-of-workout rating and note
+5c. Programs as data + split choice + today's-day switcher: each user's active program is stored as data (name, source "template"/"custom", ordered days of exercises); templates generate it; onboarding and a Program screen let the user pick a split (tradeoffs shown honestly); Today lets the user pick a different program day
+6. Set logging (editable weight on each set) + progression from history + end-of-workout rating and note
 7. Coach chat: Claude proposes changes to today's session, the engine validates them against the guardrails, and the user previews and accepts. Pain exclusions can never be overridden; volume never exceeds the green-day plan
-8. History dashboard (past sessions + weekly sets per muscle + key-lift trends)
-9. Eval set (20 check-in scenarios with expected behaviors)
-10. Launch kit: installable PWA; Korean language support (UI and AI explanations); PostHog analytics events; in-app feedback button and thumbs up/down on AI explanations; privacy notice with account deletion; per-user daily limit on AI calls; a "Liftwise Pro" fake door test
+8. Custom programs: users build their own days from the exercise library, with their own sets and rep ranges; the volume rules become warnings, not blocks
+9. History (past sessions + weekly sets per muscle + key-lift trends; a simple list if time is tight)
+10. Eval set (20 check-in scenarios with expected behaviors)
+11. Launch kit: installable PWA; Korean language support (UI and AI explanations); PostHog analytics events; in-app feedback button and thumbs up/down on AI explanations; privacy notice with account deletion; per-user daily limit on AI calls; a "Liftwise Pro" fake door test
 
 ## Out of scope for now
 - Progress photos
@@ -173,7 +179,7 @@ Engine assumptions made while building slice 2 (not yet confirmed by the owner):
 - Onboarding values: goal = strength / muscle / general (only strength changes rep ranges); energy and soreness are scored 1–5.
 
 ## Status
-Current: slice 5b (session generation) done. "Build my session" on Today builds the day's workout: the engine picks the next program day and applies deload, readiness, pain, soreness and time; weights come from onboarding starting sets (else calibration; unit-gym dumbbells capped at 20 kg). Claude (`claude-sonnet-5`, server-side, 15 s limit) may swap exercises from an allowed list, read pain/soreness from the note, and write explanations; a validator checks everything and falls back to the rules-only plan. Sessions are saved in `sessions` with Claude's raw reply, the validation result, model and prompt version (`session-v1`). The deload "stalled lifts" trigger and progression from logged sets wait for slice 6. Next: slice 6 (set logging + progression from history + end-of-workout rating and note).
+Current: slice 5b (session generation) done. "Build my session" on Today builds the day's workout: the engine picks the next program day and applies deload, readiness, pain, soreness and time; weights come from onboarding starting sets (else calibration; unit-gym dumbbells capped at 20 kg). Claude (`claude-sonnet-5`, server-side, 15 s limit) may swap exercises from an allowed list, read pain/soreness from the note, and write explanations; a validator checks everything and falls back to the rules-only plan. Sessions are saved in `sessions` with Claude's raw reply, the validation result, model and prompt version (`session-v1`). The deload "stalled lifts" trigger and progression from logged sets wait for slice 6. Next: slice 5c (programs as data + split choice + today's-day switcher).
 
 Manual steps needed in Supabase (SQL Editor), in order:
 1. `supabase/migrations/0001_profiles_and_onboarding.sql` (if not already run), and confirm email confirmations are off (Authentication → Providers → Email).
