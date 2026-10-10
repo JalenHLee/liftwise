@@ -54,10 +54,11 @@ Program templates (never let Claude invent programs):
 - 5–6 days/week -> Push/Pull/Legs
 
 ## Screens
-1. Onboarding: goal, days/week, session length, equipment (full gym / unit gym / bodyweight), experience, optional starting weights
-2. Today: check-in card -> "Build my session"
+1. Onboarding: goal, days/week, split (with "Recommended" and tradeoff notes), session length, equipment (full gym / unit gym / bodyweight), experience, optional starting weights
+2. Today: check-in card, today's program day with "Change day", -> "Build my session"
 3. Session: exercises with sets x reps x weight, target RIR, rest timer, inline set logging, "Adjusted" badge with reason
-4. History: past sessions, plus weekly sets per muscle vs 10–20 band and trends for key lifts (this replaces the old separate Progress screen)
+4. Program (from Today): the current program's days, plus days per week and split to change it
+5. History: past sessions, plus weekly sets per muscle vs 10–20 band and trends for key lifts (this replaces the old separate Progress screen)
 
 Mobile-first, one-handed use, large tap targets.
 
@@ -168,6 +169,12 @@ Owner-approved clarifications of the rules above. Follow these; ask before chang
 19. Session screen: with a starting weight the big number is the top of the rep range ("3 × 10") with "RANGE 5–10" in small mono; calibration and bodyweight exercises show the range only. Bodyweight exercises show "Bodyweight", not the calibration text.
 20. Day-wide changes (readiness, deload) are explained once on the readiness card; each exercise's explanation covers only its own changes.
 21. One session per user per day; the first build plus at most 3 rebuilds. Editing the check-in doesn't rebuild automatically: the Session screen says "Your check-in changed. Rebuild to update." and rebuilds count toward the limit.
+22. Splits on offer (days rotate in order, so splits can "roll" over weeks). Recommended choices are unchanged (2–3 Full Body, 4 Upper/Lower, 5 Push/Pull/Legs/Upper/Lower, 6 Push/Pull/Legs):
+    - Full Body: 2–5 days. Upper/Lower: 2–6 days. Push/Pull/Legs: 3–6 days. Push/Pull/Legs/Upper/Lower: 5 days.
+    - A split that fits the week is one week long (Upper/Lower on 2, 4 or 6 days; PPL on 3 or 6). Otherwise it rolls over a fixed cycle (Upper, Lower ×2 or Push, Pull, Legs ×2), e.g. PPL on 4 days goes Push, Pull, Legs, Push, then Pull, Legs, ... the next week.
+    - For a rolling split the builder aims the *average* week at the weekly band, and the program check reports average weekly frequency and volume (PPL on 4 days ≈ 1.3× a week per muscle). Tradeoff notes are built only from that check, never written per split.
+23. The Program screen can change days per week and the split; both regenerate the program after a confirmation. Goal, equipment and experience wait for a later profile editor.
+24. Replacing the program restarts the rotation at day 1. A session already built today stays as it is until it's rebuilt.
 
 Engine assumptions made while building slice 2 (not yet confirmed by the owner):
 - Bodyweight setup assumes a pull-up bar and a sturdy low bar or table (for rows and curls).
@@ -179,12 +186,13 @@ Engine assumptions made while building slice 2 (not yet confirmed by the owner):
 - Onboarding values: goal = strength / muscle / general (only strength changes rep ranges); energy and soreness are scored 1–5.
 
 ## Status
-Current: slice 5b (session generation) done. "Build my session" on Today builds the day's workout: the engine picks the next program day and applies deload, readiness, pain, soreness and time; weights come from onboarding starting sets (else calibration; unit-gym dumbbells capped at 20 kg). Claude (`claude-sonnet-5`, server-side, 15 s limit) may swap exercises from an allowed list, read pain/soreness from the note, and write explanations; a validator checks everything and falls back to the rules-only plan. Sessions are saved in `sessions` with Claude's raw reply, the validation result, model and prompt version (`session-v1`). The deload "stalled lifts" trigger and progression from logged sets wait for slice 6. Next: slice 5c (programs as data + split choice + today's-day switcher).
+Current: slice 5c (programs as data + split choice + today's-day switcher) done. Each user's active program is stored in `programs` (name, source template/custom, split, ordered days of exercise IDs with sets and optional rep-range overrides). Templates are generators over the existing week builder (identical output for every existing combination, checked against a frozen fixture). Sessions build from the stored program day; users from before 5c get their recommended program saved the first time it's needed, so nothing changes for them. Onboarding has a Split step after days per week, with "Recommended" and honest notes from the engine's program check (average frequency/volume for rolling splits). A Program screen (linked from Today) changes days per week and split, with a confirmation; the rotation restarts at day 1. Today shows "Today: Lower · next in your rotation" with "Change day"; a pick after building is a rebuild (counts toward the limit). Earlier: slice 5b session generation (engine → Claude → validator, rules-only fallback). The deload "stalled lifts" trigger and progression from logged sets wait for slice 6. Next: slice 6 (set logging with editable weight + progression + end-of-workout rating and note).
 
 Manual steps needed in Supabase (SQL Editor), in order:
 1. `supabase/migrations/0001_profiles_and_onboarding.sql` (if not already run), and confirm email confirmations are off (Authentication → Providers → Email).
 2. `supabase/migrations/0002_checkins.sql` (the `checkins` table with Row Level Security).
 3. `supabase/migrations/0003_starting_weights_reps.sql` (adds the `reps` column to `starting_weights`; run it before testing the onboarding preview).
 4. `supabase/migrations/0004_sessions.sql` (the `sessions` table with Row Level Security).
+5. `supabase/migrations/0005_programs.sql` (the `programs` table with Row Level Security; also lets `sessions.template` be 'custom' for slice 8).
 
 Vercel: set `ANTHROPIC_API_KEY` (Settings → Environment Variables, Preview and Production). Without it every session uses the rules-only plan.

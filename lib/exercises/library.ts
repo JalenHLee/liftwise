@@ -76,3 +76,6 @@ export function getExercise(id: string): Exercise {
   if (!exercise) throw new Error(`Unknown exercise: ${id}`);
   return exercise;
 }
+
+/** Like getExercise, but returns undefined for an unknown id instead of throwing. */
+export const findExercise = (id: string): Exercise | undefined => byId.get(id);

@@ -27,7 +27,10 @@ import { rowToSaved, type CheckinRow } from "@/lib/checkin/save";
 import { SESSION_MINUTES_OPTIONS } from "@/lib/onboarding/validation";
 import { ErrorText, Field, PillGroup, PrimaryButton, ReadinessCard, SecondaryButton, SectionLabel, WorkingState } from "@/components/ui";
 import { buildSession } from "@/app/session/actions";
+import { buildsLeft } from "@/lib/session/limits";
+import { todayDay, type TodaySession } from "@/lib/session/todayDay";
 import { saveCheckin } from "./actions";
+import { DayPicker } from "./DayPicker";
 
 const noopSubscribe = () => () => {};
 const titleCase = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).replace(/_/g, " ");
@@ -108,15 +111,22 @@ function Summary({ saved }: { saved: SavedCheckin }) {
   );
 }
 
+export type TodayProgram = { name: string; days: { name: string; exercises: string[] }[] };
+
 export function CheckinScreen({
   sessionMinutes,
   recent,
-  sessionDates,
+  sessions,
+  program,
+  rotationResetAt,
 }: {
   sessionMinutes: number;
   recent: CheckinRow[];
-  /** Local dates that already have a built session. */
-  sessionDates: string[];
+  /** The user's latest sessions (enough to cover today and the last one before it). */
+  sessions: TodaySession[];
+  program: TodayProgram;
+  /** When the program was last replaced; earlier sessions don't count for the rotation. */
+  rotationResetAt: string | null;
 }) {
   const router = useRouter();
   // The server can't know the user's local date, so it is read on the device after load.
@@ -128,12 +138,20 @@ export function CheckinScreen({
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isBuilding, startBuilding] = useTransition();
+  const [pickedDay, setPickedDay] = useState<number | null>(null);
 
   const fromServer = useMemo(() => recent.map(rowToSaved).find((c) => c?.date === today) ?? null, [recent, today]);
   const saved = justSaved?.date === today ? justSaved : fromServer;
   const showForm = !saved || editing;
   const sessionHref = today ? `/session?date=${today}` : "/today";
-  const hasSession = today !== null && sessionDates.includes(today);
+  const hasSession = today !== null && sessions.some((s) => s.session_date === today);
+  const day = useMemo(
+    () =>
+      today === null
+        ? null
+        : todayDay({ sessions, today, dayNames: program.days.map((d) => d.name), rotationResetAt, picked: pickedDay }),
+    [sessions, today, program, rotationResetAt, pickedDay],
+  );
 
   const live = useMemo(() => readinessDisplay(snapshotReadiness(form)), [form]);
 
@@ -156,11 +174,11 @@ export function CheckinScreen({
     });
   }
 
-  function build() {
+  function build(dayIndex?: number) {
     if (today === null) return;
     setError(null);
     startBuilding(async () => {
-      const result = await buildSession({ date: today });
+      const result = await buildSession({ date: today, dayIndex });
       if ("error" in result) {
         setError(result.error);
         return;
@@ -313,12 +331,21 @@ export function CheckinScreen({
           </div>
         ) : (
           <>
+            {day && (
+              <DayPicker
+                day={day}
+                days={program.days}
+                buildsLeft={day.built ? buildsLeft(day.built.build_count) : 0}
+                onPick={setPickedDay}
+                onRebuild={(index) => build(index)}
+              />
+            )}
             {hasSession ? (
               <PrimaryButton type="button" onClick={() => router.push(sessionHref)} className="mt-3">
                 View today&apos;s session
               </PrimaryButton>
             ) : (
-              <PrimaryButton type="button" onClick={build} className="mt-3">
+              <PrimaryButton type="button" onClick={() => build(day?.dayIndex ?? undefined)} className="mt-3">
                 Build my session
               </PrimaryButton>
             )}

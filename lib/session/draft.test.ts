@@ -4,10 +4,12 @@ import { CALIBRATION_INSTRUCTION } from "@/lib/engine/startingLoad";
 import type { CheckIn } from "@/lib/engine/types";
 import { buildDraft, loadFor, mergeCheckIn, programDay, type DraftInput } from "./draft";
 import { allowedSubstitutes } from "./substitutes";
+import { generateProgram, recommendedProgram } from "@/lib/program/program";
 
 const green: CheckIn = { sleepHours: 8, energy: 4, soreness: {}, painAreas: [], minutesAvailable: 90 };
 const base: DraftInput = {
-  profile: { goal: "muscle", experience: "intermediate", equipment: "full_gym", daysPerWeek: 4 },
+  profile: { goal: "muscle", experience: "intermediate", equipment: "full_gym" },
+  program: recommendedProgram({ experience: "intermediate", equipment: "full_gym", daysPerWeek: 4 }),
   dayIndex: 0,
   checkIn: green,
   startingWeights: {},
@@ -20,7 +22,7 @@ const ex = (plan: ReturnType<typeof buildDraft>, id: string) => plan.exercises.f
 describe("draft plan assembly", () => {
   test("a green day is the template day as written, with no tags or explanations", () => {
     const plan = draft();
-    const template = programDay(base.profile, 0);
+    const template = programDay(base.program, "muscle", 0);
     expect(plan.dayName).toBe("Upper");
     expect(plan.template).toBe("upper_lower");
     expect(plan.dayCount).toBe(4);
@@ -30,13 +32,30 @@ describe("draft plan assembly", () => {
     expect(plan.estimatedMinutes).toBeGreaterThan(0);
   });
 
-  test("uses the requested day of the template", () => {
+  test("uses the requested day of the stored program", () => {
     expect(draft({ dayIndex: 1 }).dayName).toBe("Lower");
-    expect(draft({ profile: { ...base.profile, daysPerWeek: 5 }, dayIndex: 2 }).dayName).toBe("Legs");
+    const ppl = generateProgram("push_pull_legs", { experience: "intermediate", equipment: "full_gym", daysPerWeek: 4 });
+    expect(draft({ program: ppl, dayIndex: 2 })).toMatchObject({ dayName: "Legs", template: "push_pull_legs", dayCount: 6 });
+  });
+
+  test("builds from the stored days, sets and rep overrides, not from the template", () => {
+    const custom = {
+      name: "Mine",
+      source: "custom" as const,
+      split: null,
+      days: [{ name: "Bench day", exercises: [{ exerciseId: "barbell-bench-press", sets: 5, repMin: 3, repMax: 5 }, { exerciseId: "cable-fly", sets: 2 }] }],
+    };
+    const plan = draft({ program: custom, dayIndex: 3 });
+    expect(plan).toMatchObject({ dayName: "Bench day", template: "custom", dayIndex: 0, dayCount: 1 });
+    expect(plan.exercises.map((e) => [e.exerciseId, e.sets, e.repMin, e.repMax])).toEqual([
+      ["barbell-bench-press", 5, 3, 5],
+      ["cable-fly", 2, 10, 20],
+    ]);
   });
 
   test("only uses exercises the equipment allows", () => {
-    const plan = draft({ profile: { ...base.profile, equipment: "bodyweight" } });
+    const setup = { experience: "intermediate" as const, equipment: "bodyweight" as const, daysPerWeek: 4 };
+    const plan = draft({ profile: { ...base.profile, equipment: "bodyweight" }, program: recommendedProgram(setup) });
     for (const e of plan.exercises) expect(getExercise(e.exerciseId).equipment.every((q) => ["pullup_bar", "low_bar"].includes(q))).toBe(true);
   });
 

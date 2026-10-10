@@ -4,11 +4,14 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { anthropicClient } from "@/lib/session/ai";
-import { buildSessionForUser, type BuildResult } from "@/lib/session/save";
+import { buildSessionForUser, type BuildRequest, type BuildResult } from "@/lib/session/save";
 import { supabaseSessionStore } from "@/lib/session/supabaseStore";
 
-/** Builds (or rebuilds) today's session. Claude is only ever called from here, on the server. */
-export async function buildSession(input: { date: string }): Promise<BuildResult> {
+/**
+ * Builds (or rebuilds) today's session, optionally on a program day the user picked.
+ * Claude is only ever called from here, on the server.
+ */
+export async function buildSession(input: BuildRequest): Promise<BuildResult> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -18,7 +21,7 @@ export async function buildSession(input: { date: string }): Promise<BuildResult
   const apiKey = process.env.ANTHROPIC_API_KEY;
   const ai = apiKey ? anthropicClient(apiKey) : null;
 
-  const result = await buildSessionForUser(supabaseSessionStore(supabase), user.id, input.date, ai);
+  const result = await buildSessionForUser(supabaseSessionStore(supabase), user.id, { date: input.date, dayIndex: input.dayIndex }, ai);
   if ("built" in result) {
     revalidatePath("/today");
     revalidatePath("/session");

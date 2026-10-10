@@ -6,16 +6,12 @@ import { useState, useTransition } from "react";
 import { ErrorText, ReadinessCard, SecondaryButton, SectionLabel, WorkingState } from "@/components/ui";
 import { formatDateLabel, READINESS_COPY } from "@/lib/checkin/logic";
 import { getExercise } from "@/lib/exercises/library";
+import { SPLIT_NAMES } from "@/lib/engine/templates";
 import { details, readinessTags, repsPerSet, rirTarget, setsByReps, weightLabel } from "@/lib/session/display";
 import type { SessionExercise, SessionPlan } from "@/lib/session/types";
 import { buildSession } from "./actions";
 
-const TEMPLATE_NAMES: Record<SessionPlan["template"], string> = {
-  full_body: "Full body",
-  upper_lower: "Upper / Lower",
-  push_pull_legs: "Push / Pull / Legs",
-  push_pull_legs_upper_lower: "Push / Pull / Legs / Upper / Lower",
-};
+const TEMPLATE_NAMES: Record<SessionPlan["template"], string> = { ...SPLIT_NAMES, custom: "Custom" };
 
 function Stat({ value, label }: { value: string | number; label: string }) {
   return (

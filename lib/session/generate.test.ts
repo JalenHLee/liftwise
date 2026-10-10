@@ -3,6 +3,7 @@ import { getExercise } from "@/lib/exercises/library";
 import { sessionVolume } from "@/lib/engine/volume";
 import type { CheckIn } from "@/lib/engine/types";
 import { PROMPT_VERSION, SESSION_MODEL, type AiClient } from "./ai";
+import { recommendedProgram } from "@/lib/program/program";
 import { buildDraft } from "./draft";
 import { generateSession, type GenerateInput } from "./generate";
 import type { SessionPlan } from "./types";
@@ -10,7 +11,8 @@ import { checkInvariants, parseAiOutput } from "./validate";
 
 const checkIn: CheckIn = { sleepHours: 8, energy: 4, soreness: {}, painAreas: [], minutesAvailable: 90 };
 const input: GenerateInput = {
-  profile: { goal: "muscle", experience: "intermediate", equipment: "full_gym", daysPerWeek: 4 },
+  profile: { goal: "muscle", experience: "intermediate", equipment: "full_gym" },
+  program: recommendedProgram({ experience: "intermediate", equipment: "full_gym", daysPerWeek: 4 }),
   dayIndex: 0,
   checkIn,
   startingWeights: { "barbell-bench-press": { weightKg: 80, reps: 5 } },

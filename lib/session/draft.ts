@@ -4,19 +4,21 @@ import { maxLoadFor } from "@/lib/engine/equipment";
 import { applyPain, applySoreness, applyTimeLimit, estimateMinutes } from "@/lib/engine/modifiers";
 import { applyReadiness, scoreReadiness } from "@/lib/engine/readiness";
 import { startingLoadFor, type RecentSet } from "@/lib/engine/startingLoad";
-import { buildWeek } from "@/lib/engine/templates";
 import { MUSCLES, type CheckIn, type EquipmentSetup, type Exercise, type Experience, type Goal, type PlannedExercise, type Readiness } from "@/lib/engine/types";
+import { prescribeDay } from "@/lib/program/program";
+import type { Program } from "@/lib/program/types";
 import type { SessionExercise, SessionLoad, SessionPlan } from "./types";
 
 export type DraftProfile = {
   goal: Goal;
   experience: Experience;
   equipment: EquipmentSetup;
-  daysPerWeek: number;
 };
 
 export type DraftInput = {
   profile: DraftProfile;
+  /** The user's stored program; today's day is `program.days[dayIndex]`. */
+  program: Program;
   dayIndex: number;
   checkIn: CheckIn;
   /** Last solid set per exercise id, from onboarding. */
@@ -36,11 +38,10 @@ function yellowCause(tags: string[]): string {
   return "SORENESS";
 }
 
-/** The program day's exercises as the template prescribes them. */
-export function programDay(profile: DraftProfile, dayIndex: number) {
-  const week = buildWeek(profile);
-  const day = week.sessions[dayIndex % week.sessions.length];
-  return { template: week.template, dayCount: week.sessions.length, name: day.name, exercises: day.exercises };
+/** The program day's exercises, prescribed for the goal. */
+export function programDay(program: Program, goal: Goal, dayIndex: number) {
+  const day = program.days[dayIndex % program.days.length];
+  return { template: program.split ?? ("custom" as const), dayCount: program.days.length, name: day.name, exercises: prescribeDay(day, goal) };
 }
 
 /** Starting weight from onboarding, else calibration; bodyweight exercises are "bodyweight". */
@@ -78,12 +79,12 @@ export function rulesSummary(plan: Pick<SessionPlan, "readiness" | "deload" | "r
 }
 
 /**
- * The rules-only plan for today: template day -> deload -> readiness -> pain -> soreness -> time
+ * The rules-only plan for today: program day -> deload -> readiness -> pain -> soreness -> time
  * (decision 10), with weights from onboarding and template explanations. No AI involved.
  */
 export function buildDraft(input: DraftInput): SessionPlan {
   const { profile, checkIn } = input;
-  const day = programDay(profile, input.dayIndex);
+  const day = programDay(input.program, profile.goal, input.dayIndex);
   const readiness = scoreReadiness(checkIn);
   const tags = new Map<string, string[]>(day.exercises.map((e) => [e.exerciseId, []]));
   const tag = (id: string, t: string) => tags.get(id)?.push(t);
