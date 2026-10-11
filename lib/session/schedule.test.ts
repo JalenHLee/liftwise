@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { deloadToday, pickDayIndex } from "./schedule";
+import { deloadToday, pickDayIndex, rotationFor } from "./schedule";
 
 describe("template day rotation", () => {
   test("the first ever session is day 1", () => {
@@ -56,5 +56,27 @@ describe("deload schedule", () => {
     const result = deloadToday({ ...none, today: "2026-10-09", checkIns });
     expect(result.deload).toBe(true);
     expect(result.reasons).toContain("3 or more red days in the last 7 days");
+  });
+});
+
+describe("rotation from stored sessions", () => {
+  const s = (session_date: string, day_index: number, updated_at = "2026-10-01T08:00:00Z") => ({ session_date, day_index, updated_at });
+  const base = { today: "2026-10-09", dayCount: 4, rotationResetAt: null };
+
+  test("next day after the last session; today's day once built", () => {
+    expect(rotationFor({ ...base, sessions: [s("2026-10-06", 0), s("2026-10-08", 1)] })).toEqual({ dayIndex: 2, todaysDayIndex: null });
+    expect(rotationFor({ ...base, sessions: [s("2026-10-08", 1), s("2026-10-09", 3)] })).toEqual({ dayIndex: 3, todaysDayIndex: 3 });
+  });
+
+  test("a manually picked day moves the rotation on from that day", () => {
+    // Day 1 (index 0) was next on the 8th, but the user picked day 3 (index 2).
+    expect(rotationFor({ ...base, sessions: [s("2026-10-07", 3), s("2026-10-08", 2)] }).dayIndex).toBe(3);
+  });
+
+  test("sessions built before the program was replaced don't count", () => {
+    const sessions = [s("2026-10-07", 1), s("2026-10-08", 2), s("2026-10-09", 3)];
+    expect(rotationFor({ ...base, sessions, rotationResetAt: "2026-10-09T07:00:00Z" })).toEqual({ dayIndex: 0, todaysDayIndex: null });
+    const rebuilt = [s("2026-10-08", 2), s("2026-10-09", 0, "2026-10-09T07:30:00Z")];
+    expect(rotationFor({ ...base, sessions: rebuilt, rotationResetAt: "2026-10-09T07:00:00Z" })).toEqual({ dayIndex: 0, todaysDayIndex: 0 });
   });
 });

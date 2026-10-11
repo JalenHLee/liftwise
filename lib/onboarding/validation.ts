@@ -1,6 +1,7 @@
 import { EQUIPMENT_SETUPS, EXPERIENCES, GOALS } from "@/lib/engine/types";
 import type { EquipmentSetup, Experience, Goal } from "@/lib/engine/types";
 import { weightedKeyLiftsFor } from "@/lib/onboarding/keyLifts";
+import { isSplitAllowed } from "@/lib/engine/templates";
 
 export const SESSION_MINUTES_OPTIONS = [30, 45, 60, 75, 90] as const;
 export const DAYS_PER_WEEK_OPTIONS = [2, 3, 4, 5, 6] as const;
@@ -16,6 +17,8 @@ export type OnboardingInput = {
   firstName: string;
   goal: string;
   daysPerWeek: number;
+  /** The program split, one of those offered for `daysPerWeek`. */
+  split: string;
   sessionMinutes: number;
   equipment: string;
   experience: string;
@@ -40,6 +43,8 @@ export function validateOnboarding(input: OnboardingInput): OnboardingErrors {
 
   if (!DAYS_PER_WEEK_OPTIONS.includes(input.daysPerWeek as (typeof DAYS_PER_WEEK_OPTIONS)[number])) {
     errors.daysPerWeek = "Choose 2 to 6 days a week.";
+  } else if (!isSplitAllowed(input.split, input.daysPerWeek)) {
+    errors.split = "Choose a split.";
   }
 
   if (!SESSION_MINUTES_OPTIONS.includes(input.sessionMinutes as (typeof SESSION_MINUTES_OPTIONS)[number])) {

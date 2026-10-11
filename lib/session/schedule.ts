@@ -20,6 +20,31 @@ export function pickDayIndex(input: {
   return (lastDayIndexBeforeToday + 1) % dayCount;
 }
 
+export type RotationSession = { session_date: string; day_index: number; updated_at: string };
+
+/**
+ * Where today sits in the rotation. Only sessions built since the program was last replaced
+ * count (decision 24: a new program starts at day 1). `todaysDayIndex` is today's built day,
+ * when it counts; `dayIndex` is the day to build (today's day for a rebuild, else the next one).
+ */
+export function rotationFor(input: {
+  sessions: RotationSession[];
+  today: string;
+  dayCount: number;
+  rotationResetAt: string | null;
+}): { dayIndex: number; todaysDayIndex: number | null } {
+  const reset = input.rotationResetAt ? Date.parse(input.rotationResetAt) : null;
+  const counted = input.sessions.filter((s) => reset === null || Date.parse(s.updated_at) >= reset);
+  const today = dayNumber(input.today);
+  const todays = counted.find((s) => dayNumber(s.session_date) === today);
+  const last = counted.filter((s) => dayNumber(s.session_date) < today).sort((a, b) => dayNumber(b.session_date) - dayNumber(a.session_date))[0];
+  const todaysDayIndex = todays ? todays.day_index % input.dayCount : null;
+  return {
+    dayIndex: pickDayIndex({ dayCount: input.dayCount, todaysDayIndex, lastDayIndexBeforeToday: last?.day_index }),
+    todaysDayIndex,
+  };
+}
+
 export type DeloadHistory = {
   today: string;
   /** Dates of earlier sessions (before today). */

@@ -1,11 +1,15 @@
-import { EXERCISES } from "@/lib/exercises/library";
+import { EXERCISES, getExercise } from "@/lib/exercises/library";
 import { isAvailable } from "./equipment";
 import { prescribe } from "./prescription";
 import type { EquipmentSetup, Exercise, ExerciseType, Experience, Goal, Muscle, PlannedExercise } from "./types";
 import { MAX_SETS_PER_MUSCLE_PER_SESSION, WEEKLY_SET_BANDS } from "./volume";
 
-export type TemplateName = "full_body" | "upper_lower" | "push_pull_legs" | "push_pull_legs_upper_lower";
-type SessionType = "full_body" | "upper" | "lower" | "push" | "pull" | "legs";
+/** The program splits. A split is a cycle of day types; days rotate in order (decision 17). */
+export const SPLITS = ["full_body", "upper_lower", "push_pull_legs", "push_pull_legs_upper_lower"] as const;
+export type SplitId = (typeof SPLITS)[number];
+/** Kept for older code: a template is a split. */
+export type TemplateName = SplitId;
+export type SessionType = "full_body" | "upper" | "lower" | "push" | "pull" | "legs";
 type SlotSpec = [Muscle, ExerciseType];
 type FilledSlot = { exercise: Exercise; sets: number };
 
@@ -38,13 +42,58 @@ const SLOTS: Record<SessionType, SlotSpec[]> = {
   ],
 };
 
-const WEEKS: Record<number, { template: TemplateName; days: SessionType[] }> = {
-  2: { template: "full_body", days: ["full_body", "full_body"] },
-  3: { template: "full_body", days: ["full_body", "full_body", "full_body"] },
-  4: { template: "upper_lower", days: ["upper", "lower", "upper", "lower"] },
-  5: { template: "push_pull_legs_upper_lower", days: ["push", "pull", "legs", "upper", "lower"] },
-  6: { template: "push_pull_legs", days: ["push", "pull", "legs", "push", "pull", "legs"] },
+/** Days per week each split can be used for (decision 22). */
+export const SPLIT_DAYS: Record<SplitId, readonly number[]> = {
+  full_body: [2, 3, 4, 5],
+  upper_lower: [2, 3, 4, 5, 6],
+  push_pull_legs: [3, 4, 5, 6],
+  push_pull_legs_upper_lower: [5],
 };
+
+/** The app's choice for each number of days (unchanged since slice 2). */
+export const RECOMMENDED_SPLIT: Record<number, SplitId> = {
+  2: "full_body",
+  3: "full_body",
+  4: "upper_lower",
+  5: "push_pull_legs_upper_lower",
+  6: "push_pull_legs",
+};
+
+export const SPLIT_NAMES: Record<SplitId, string> = {
+  full_body: "Full Body",
+  upper_lower: "Upper / Lower",
+  push_pull_legs: "Push / Pull / Legs",
+  push_pull_legs_upper_lower: "Push / Pull / Legs / Upper / Lower",
+};
+
+/** Splits offered for a number of days, the recommended one first. */
+export function splitsFor(daysPerWeek: number): SplitId[] {
+  const recommended = RECOMMENDED_SPLIT[daysPerWeek];
+  if (!recommended) return [];
+  return [recommended, ...SPLITS.filter((s) => s !== recommended && SPLIT_DAYS[s].includes(daysPerWeek))];
+}
+
+export const isSplitAllowed = (split: string, daysPerWeek: number): split is SplitId =>
+  (SPLITS as readonly string[]).includes(split) && SPLIT_DAYS[split as SplitId].includes(daysPerWeek);
+
+/**
+ * The split's cycle of days. When the split fits the week exactly (Upper/Lower on an even number
+ * of days, Push/Pull/Legs on 3 or 6) the cycle is one week. Otherwise it repeats a fixed cycle
+ * (Upper, Lower ×2 or Push, Pull, Legs ×2) that "rolls" over weeks, e.g. PPL on 4 days.
+ */
+export function splitCycle(split: SplitId, daysPerWeek: number): SessionType[] {
+  const repeat = (days: SessionType[], times: number) => Array.from({ length: times }, () => days).flat();
+  switch (split) {
+    case "full_body":
+      return repeat(["full_body"], daysPerWeek);
+    case "upper_lower":
+      return repeat(["upper", "lower"], daysPerWeek % 2 === 0 ? daysPerWeek / 2 : 2);
+    case "push_pull_legs":
+      return repeat(["push", "pull", "legs"], daysPerWeek % 3 === 0 ? daysPerWeek / 3 : 2);
+    case "push_pull_legs_upper_lower":
+      return ["push", "pull", "legs", "upper", "lower"];
+  }
+}
 
 const SESSION_NAMES: Record<SessionType, string> = {
   full_body: "Full Body", upper: "Upper", lower: "Lower", push: "Push", pull: "Pull", legs: "Legs",
@@ -64,6 +113,11 @@ export type WeekPlan = {
   sessions: { name: string; exercises: PlannedExercise[] }[];
 };
 
+export type CyclePlanInput = Omit<WeekPlanInput, "goal"> & { split: SplitId };
+
+/** One day of a generated cycle: exercise ids and their sets (rep ranges come from the goal). */
+export type CycleDay = { name: string; exercises: { exerciseId: string; sets: number }[] };
+
 /**
  * Picks an exercise for a slot; `variant` rotates choices so repeated days differ.
  * Returns undefined when the setup has nothing left for this muscle in this session.
@@ -82,13 +136,20 @@ function pickExercise(
   return candidates.length ? candidates[variant % candidates.length] : undefined;
 }
 
-export function buildWeek(input: WeekPlanInput): WeekPlan {
-  const week = WEEKS[input.daysPerWeek];
-  if (!week) throw new Error("Days per week must be between 2 and 6");
+/**
+ * Fills the split's cycle with exercises and sets. Sets go one at a time to the muscle furthest
+ * below its weekly minimum. When the cycle is longer or shorter than a week, the weekly targets
+ * are scaled by cycle length / days per week, so the AVERAGE week lands in the band.
+ */
+export function buildCycle(input: CyclePlanInput): CycleDay[] {
+  if (!isSplitAllowed(input.split, input.daysPerWeek)) throw new Error("That split isn't available for that many days");
+  const cycle = splitCycle(input.split, input.daysPerWeek);
   const band = WEEKLY_SET_BANDS[input.experience];
+  // Sets per cycle that average out to the weekly band (exactly the band when cycle = week).
+  const target = { min: (band.min * cycle.length) / input.daysPerWeek, max: (band.max * cycle.length) / input.daysPerWeek };
 
   const seen: Partial<Record<SessionType, number>> = {};
-  const sessions = week.days.map((type) => {
+  const sessions = cycle.map((type) => {
     const variant = seen[type] ?? 0;
     seen[type] = variant + 1;
     const used = new Set<string>();
@@ -109,11 +170,11 @@ export function buildWeek(input: WeekPlanInput): WeekPlan {
     ...e.secondaryMuscles.map((m): [Muscle, number] => [m, 0.5]),
   ];
 
-  // Add one set at a time to the muscle furthest below its weekly minimum.
+  // Add one set at a time to the muscle furthest below its minimum.
   const blocked = new Set<Muscle>();
   for (;;) {
     const needy = [...new Set(sessions.flatMap((s) => s.slots.map((sl) => sl.exercise.primaryMuscle)))]
-      .filter((m) => (weekly.get(m) ?? 0) < band.min && !blocked.has(m))
+      .filter((m) => (weekly.get(m) ?? 0) < target.min && !blocked.has(m))
       .sort((a, b) => (weekly.get(a) ?? 0) - (weekly.get(b) ?? 0));
     if (!needy.length) break;
     const muscle = needy[0];
@@ -127,7 +188,7 @@ export function buildWeek(input: WeekPlanInput): WeekPlan {
         const fits = contributions(slot.exercise).every(
           ([m, v]) =>
             (sessionVol[s].get(m) ?? 0) + v <= MAX_SETS_PER_MUSCLE_PER_SESSION &&
-            (weekly.get(m) ?? 0) + v <= band.max,
+            (weekly.get(m) ?? 0) + v <= target.max,
         );
         if (!fits) continue;
         const score: [number, number] = [sessionVol[s].get(muscle) ?? 0, Math.max(slot.sets, SETS_BEFORE_SPREADING)];
@@ -149,11 +210,21 @@ export function buildWeek(input: WeekPlanInput): WeekPlan {
     }
   }
 
+  return sessions.map(({ type, slots }) => ({
+    name: SESSION_NAMES[type],
+    exercises: slots.filter((sl) => sl.sets > 0).map((sl) => ({ exerciseId: sl.exercise.id, sets: sl.sets })),
+  }));
+}
+
+/** The recommended split's week, fully prescribed for the goal. */
+export function buildWeek(input: WeekPlanInput): WeekPlan {
+  const split = RECOMMENDED_SPLIT[input.daysPerWeek];
+  if (!split) throw new Error("Days per week must be between 2 and 6");
   return {
-    template: week.template,
-    sessions: sessions.map(({ type, slots }) => ({
-      name: SESSION_NAMES[type],
-      exercises: slots.filter((sl) => sl.sets > 0).map((sl) => prescribe(sl.exercise, input.goal, sl.sets)),
+    template: split,
+    sessions: buildCycle({ ...input, split }).map((day) => ({
+      name: day.name,
+      exercises: day.exercises.map((e) => prescribe(getExercise(e.exerciseId), input.goal, e.sets)),
     })),
   };
 }

@@ -1,4 +1,4 @@
-import type { TemplateName } from "@/lib/engine/templates";
+import type { SplitId } from "@/lib/engine/templates";
 import type { Muscle, PainArea, PlannedExercise, Readiness } from "@/lib/engine/types";
 
 /** What goes on the bar: a starting weight, a calibration instruction, or bodyweight. */
@@ -19,7 +19,8 @@ export type SessionExercise = PlannedExercise & {
 };
 
 export type SessionPlan = {
-  template: TemplateName;
+  /** The split the program came from, or "custom" (slice 8). */
+  template: SplitId | "custom";
   dayIndex: number;
   /** Days in the program's rotation, e.g. 4 for Upper/Lower. */
   dayCount: number;

@@ -15,6 +15,8 @@ import {
   type OnboardingErrors,
 } from "@/lib/onboarding/validation";
 import { ErrorText, PillGroup, PrimaryButton, SectionLabel } from "@/components/ui";
+import { SplitOptions } from "@/components/SplitOptions";
+import { RECOMMENDED_SPLIT, type SplitId } from "@/lib/engine/templates";
 import { saveOnboarding } from "./actions";
 
 const GOAL_LABELS: Record<Goal, string> = {
@@ -43,6 +45,7 @@ export function OnboardingForm() {
   const [firstName, setFirstName] = useState("");
   const [goal, setGoal] = useState<Goal>("muscle");
   const [daysPerWeek, setDaysPerWeek] = useState<number>(4);
+  const [split, setSplit] = useState<SplitId>(RECOMMENDED_SPLIT[4]);
   const [sessionMinutes, setSessionMinutes] = useState<number>(60);
   const [equipment, setEquipment] = useState<EquipmentSetup>("full_gym");
   const [experience, setExperience] = useState<Experience>("beginner");
@@ -65,7 +68,7 @@ export function OnboardingForm() {
       return;
     }
 
-    const input = { firstName, goal, daysPerWeek, sessionMinutes, equipment, experience, startingWeights };
+    const input = { firstName, goal, daysPerWeek, split, sessionMinutes, equipment, experience, startingWeights };
     const clientErrors = validateOnboarding(input);
     if (!isValid(clientErrors)) {
       setErrors(clientErrors);
@@ -100,11 +103,25 @@ export function OnboardingForm() {
       </Section>
 
       <Section index={3} label="Frequency" question="How many days a week?">
-        <PillGroup options={DAYS_PER_WEEK_OPTIONS} value={daysPerWeek} onChange={setDaysPerWeek} numeric />
+        <PillGroup
+          options={DAYS_PER_WEEK_OPTIONS}
+          value={daysPerWeek}
+          onChange={(next) => {
+            setDaysPerWeek(next);
+            setSplit(RECOMMENDED_SPLIT[next]);
+          }}
+          numeric
+        />
         {errors.daysPerWeek && <ErrorText>{errors.daysPerWeek}</ErrorText>}
       </Section>
 
-      <Section index={4} label="Session length" question="How long is each session?">
+      <Section index={4} label="Split" question="How should we split your week?">
+        <p className="-mt-1 text-sm text-muted">Days run in order, whatever the weekday. You can change this later.</p>
+        <SplitOptions daysPerWeek={daysPerWeek} experience={experience} equipment={equipment} value={split} onChange={setSplit} />
+        {errors.split && <ErrorText>{errors.split}</ErrorText>}
+      </Section>
+
+      <Section index={5} label="Session length" question="How long is each session?">
         <PillGroup
           options={SESSION_MINUTES_OPTIONS}
           value={sessionMinutes}
@@ -114,7 +131,7 @@ export function OnboardingForm() {
         {errors.sessionMinutes && <ErrorText>{errors.sessionMinutes}</ErrorText>}
       </Section>
 
-      <Section index={5} label="Equipment" question="Where do you train?">
+      <Section index={6} label="Equipment" question="Where do you train?">
         <PillGroup
           options={EQUIPMENT_SETUPS}
           value={equipment}
@@ -127,13 +144,13 @@ export function OnboardingForm() {
         {errors.equipment && <ErrorText>{errors.equipment}</ErrorText>}
       </Section>
 
-      <Section index={6} label="Experience" question="How experienced are you?">
+      <Section index={7} label="Experience" question="How experienced are you?">
         <PillGroup options={EXPERIENCES} value={experience} onChange={setExperience} labels={EXPERIENCE_LABELS} />
         {errors.experience && <ErrorText>{errors.experience}</ErrorText>}
       </Section>
 
       {keyLifts.length > 0 && (
-        <Section index={7} label="Starting weights · optional" question="Know your working weights?">
+        <Section index={8} label="Starting weights · optional" question="Know your working weights?">
           <p className="-mt-1 text-sm text-muted">
             Your last solid set on each lift, if you remember it. Skip any you don&apos;t and we&apos;ll help you
             find the weight in your first session.

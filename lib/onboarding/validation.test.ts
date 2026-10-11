@@ -6,6 +6,7 @@ function baseInput(overrides: Partial<OnboardingInput> = {}): OnboardingInput {
     firstName: "Jalen",
     goal: "muscle",
     daysPerWeek: 4,
+    split: "upper_lower",
     sessionMinutes: 60,
     equipment: "full_gym",
     experience: "intermediate",
@@ -39,6 +40,14 @@ describe("validateOnboarding", () => {
   test("rejects a days-per-week outside 2-6", () => {
     expect(validateOnboarding(baseInput({ daysPerWeek: 1 })).daysPerWeek).toBeDefined();
     expect(validateOnboarding(baseInput({ daysPerWeek: 7 })).daysPerWeek).toBeDefined();
+  });
+
+  test("accepts any split offered for the days, rejects the rest", () => {
+    expect(isValid(validateOnboarding(baseInput({ daysPerWeek: 4, split: "push_pull_legs" })))).toBe(true);
+    expect(isValid(validateOnboarding(baseInput({ daysPerWeek: 3, split: "push_pull_legs" })))).toBe(true);
+    expect(validateOnboarding(baseInput({ daysPerWeek: 2, split: "push_pull_legs" })).split).toBeDefined();
+    expect(validateOnboarding(baseInput({ daysPerWeek: 4, split: "push_pull_legs_upper_lower" })).split).toBeDefined();
+    expect(validateOnboarding(baseInput({ split: "bro_split" })).split).toBeDefined();
   });
 
   test("rejects a session length that isn't one of the tap options", () => {

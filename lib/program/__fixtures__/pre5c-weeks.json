@@ -1,0 +1,272 @@
+{
+ "2/beginner/full_gym": [
+  "Full Body: back-squat×4, barbell-bench-press×4, pull-up×3, deadlift×4, overhead-press×3, barbell-hip-thrust×1, leg-extension×1, cable-fly×1, leg-curl×1, barbell-curl×3, cable-pushdown×1, machine-calf-raise×5, cable-crunch×5",
+  "Full Body: leg-press×4, incline-dumbbell-press×4, barbell-row×4, romanian-deadlift×4, machine-shoulder-press×3, barbell-hip-thrust×1, sissy-squat×1, cable-fly×1, lat-pulldown×1, dumbbell-curl×3, overhead-dumbbell-extension×2, smith-calf-raise×5, hanging-knee-raise×5"
+ ],
+ "2/beginner/unit_gym": [
+  "Full Body: back-squat×4, barbell-bench-press×4, barbell-row×3, deadlift×4, overhead-press×3, barbell-hip-thrust×1, sissy-squat×1, cable-fly×1, sliding-leg-curl×1, barbell-curl×3, cable-pushdown×1, smith-calf-raise×5, cable-crunch×5",
+  "Full Body: goblet-squat×4, incline-dumbbell-press×4, lat-pulldown×4, romanian-deadlift×4, machine-shoulder-press×3, barbell-hip-thrust×1, sissy-squat×1, cable-fly×1, seated-cable-row×1, dumbbell-curl×3, overhead-dumbbell-extension×2, single-leg-calf-raise×5, dead-bug×5"
+ ],
+ "2/beginner/bodyweight": [
+  "Full Body: split-squat×4, push-up×5, pull-up×4, sliding-leg-curl×5, pike-push-up×2, glute-bridge×3, sissy-squat×1, inverted-row×1, bodyweight-curl×2, bench-dip×2, single-leg-calf-raise×5, hanging-knee-raise×5",
+  "Full Body: split-squat×4, push-up×5, inverted-row×4, sliding-leg-curl×5, pike-push-up×3, glute-bridge×3, sissy-squat×1, pull-up×1, bodyweight-curl×3, bench-dip×1, single-leg-calf-raise×5, dead-bug×5"
+ ],
+ "2/intermediate/full_gym": [
+  "Full Body: back-squat×4, barbell-bench-press×4, pull-up×4, deadlift×4, overhead-press×4, barbell-hip-thrust×2, leg-extension×2, cable-fly×2, leg-curl×1, barbell-curl×4, cable-pushdown×2, machine-calf-raise×6, cable-crunch×6",
+  "Full Body: leg-press×4, incline-dumbbell-press×4, barbell-row×4, romanian-deadlift×4, machine-shoulder-press×4, barbell-hip-thrust×2, sissy-squat×2, cable-fly×2, lat-pulldown×2, sliding-leg-curl×1, dumbbell-curl×3, overhead-dumbbell-extension×2, smith-calf-raise×6, hanging-knee-raise×6"
+ ],
+ "2/intermediate/unit_gym": [
+  "Full Body: back-squat×4, barbell-bench-press×4, barbell-row×4, deadlift×4, overhead-press×4, barbell-hip-thrust×2, sissy-squat×2, cable-fly×2, sliding-leg-curl×1, barbell-curl×4, cable-pushdown×2, smith-calf-raise×6, cable-crunch×6",
+  "Full Body: goblet-squat×4, incline-dumbbell-press×4, lat-pulldown×4, romanian-deadlift×4, machine-shoulder-press×4, barbell-hip-thrust×2, sissy-squat×2, cable-fly×2, seated-cable-row×2, sliding-leg-curl×1, dumbbell-curl×3, overhead-dumbbell-extension×2, single-leg-calf-raise×6, dead-bug×6"
+ ],
+ "2/intermediate/bodyweight": [
+  "Full Body: split-squat×4, push-up×6, pull-up×4, sliding-leg-curl×6, pike-push-up×3, glute-bridge×4, sissy-squat×2, inverted-row×2, bodyweight-curl×3, bench-dip×2, single-leg-calf-raise×6, hanging-knee-raise×6",
+  "Full Body: split-squat×4, push-up×6, inverted-row×4, sliding-leg-curl×6, pike-push-up×3, glute-bridge×4, sissy-squat×2, pull-up×2, bodyweight-curl×3, bench-dip×1, single-leg-calf-raise×6, dead-bug×6"
+ ],
+ "2/advanced/full_gym": [
+  "Full Body: back-squat×4, barbell-bench-press×4, pull-up×4, deadlift×4, overhead-press×4, barbell-hip-thrust×3, leg-extension×3, cable-fly×3, barbell-row×1, leg-curl×2, dumbbell-lateral-raise×1, barbell-curl×4, cable-pushdown×3, machine-calf-raise×7, cable-crunch×7",
+  "Full Body: leg-press×4, incline-dumbbell-press×4, barbell-row×4, romanian-deadlift×4, machine-shoulder-press×4, barbell-hip-thrust×3, sissy-squat×3, cable-fly×3, lat-pulldown×3, sliding-leg-curl×1, face-pull×1, dumbbell-curl×4, overhead-dumbbell-extension×3, smith-calf-raise×7, hanging-knee-raise×7"
+ ],
+ "2/advanced/unit_gym": [
+  "Full Body: back-squat×4, barbell-bench-press×4, barbell-row×4, deadlift×4, overhead-press×4, barbell-hip-thrust×3, sissy-squat×3, cable-fly×3, lat-pulldown×1, sliding-leg-curl×2, dumbbell-lateral-raise×1, barbell-curl×4, cable-pushdown×3, smith-calf-raise×7, cable-crunch×7",
+  "Full Body: goblet-squat×4, incline-dumbbell-press×4, lat-pulldown×4, romanian-deadlift×4, machine-shoulder-press×4, barbell-hip-thrust×3, sissy-squat×3, cable-fly×3, seated-cable-row×3, sliding-leg-curl×1, face-pull×1, dumbbell-curl×4, overhead-dumbbell-extension×3, single-leg-calf-raise×7, dead-bug×7"
+ ],
+ "2/advanced/bodyweight": [
+  "Full Body: split-squat×4, push-up×7, pull-up×4, sliding-leg-curl×7, pike-push-up×3, glute-bridge×5, sissy-squat×3, inverted-row×3, bodyweight-curl×3, bench-dip×2, single-leg-calf-raise×7, hanging-knee-raise×7",
+  "Full Body: split-squat×4, push-up×7, inverted-row×4, sliding-leg-curl×7, pike-push-up×4, glute-bridge×5, sissy-squat×3, pull-up×3, bodyweight-curl×4, bench-dip×2, single-leg-calf-raise×7, dead-bug×7"
+ ],
+ "3/beginner/full_gym": [
+  "Full Body: back-squat×4, barbell-bench-press×4, pull-up×2, deadlift×4, overhead-press×2, barbell-curl×2, cable-pushdown×1, machine-calf-raise×4, cable-crunch×4",
+  "Full Body: leg-press×3, incline-dumbbell-press×3, barbell-row×3, romanian-deadlift×3, machine-shoulder-press×2, dumbbell-curl×2, overhead-dumbbell-extension×1, smith-calf-raise×3, hanging-knee-raise×3",
+  "Full Body: goblet-squat×3, dumbbell-bench-press×3, lat-pulldown×3, dumbbell-romanian-deadlift×3, dumbbell-shoulder-press×1, cable-curl×2, bench-dip×1, single-leg-calf-raise×3, dead-bug×3"
+ ],
+ "3/beginner/unit_gym": [
+  "Full Body: back-squat×4, barbell-bench-press×4, barbell-row×2, deadlift×4, overhead-press×2, barbell-curl×2, cable-pushdown×1, smith-calf-raise×4, cable-crunch×4",
+  "Full Body: goblet-squat×3, incline-dumbbell-press×3, lat-pulldown×3, romanian-deadlift×3, machine-shoulder-press×2, dumbbell-curl×2, overhead-dumbbell-extension×1, single-leg-calf-raise×3, dead-bug×3",
+  "Full Body: dumbbell-walking-lunge×3, dumbbell-bench-press×3, seated-cable-row×3, dumbbell-romanian-deadlift×3, dumbbell-shoulder-press×1, cable-curl×2, bench-dip×1, smith-calf-raise×3, cable-crunch×3"
+ ],
+ "3/beginner/bodyweight": [
+  "Full Body: split-squat×4, push-up×4, pull-up×4, sliding-leg-curl×4, pike-push-up×2, glute-bridge×2, bodyweight-curl×2, bench-dip×1, single-leg-calf-raise×4, hanging-knee-raise×4",
+  "Full Body: split-squat×3, push-up×3, inverted-row×3, sliding-leg-curl×3, pike-push-up×2, glute-bridge×2, bodyweight-curl×2, bench-dip×1, single-leg-calf-raise×3, dead-bug×3",
+  "Full Body: split-squat×3, push-up×3, pull-up×3, sliding-leg-curl×3, pike-push-up×1, glute-bridge×1, bodyweight-curl×1, bench-dip×1, single-leg-calf-raise×3, hanging-knee-raise×3"
+ ],
+ "3/intermediate/full_gym": [
+  "Full Body: back-squat×4, barbell-bench-press×4, pull-up×2, deadlift×4, overhead-press×2, barbell-curl×3, cable-pushdown×1, machine-calf-raise×4, cable-crunch×4",
+  "Full Body: leg-press×4, incline-dumbbell-press×4, barbell-row×4, romanian-deadlift×4, machine-shoulder-press×2, dumbbell-curl×2, overhead-dumbbell-extension×1, smith-calf-raise×4, hanging-knee-raise×4",
+  "Full Body: goblet-squat×4, dumbbell-bench-press×4, lat-pulldown×4, dumbbell-romanian-deadlift×4, dumbbell-shoulder-press×2, cable-curl×2, bench-dip×1, single-leg-calf-raise×4, dead-bug×4"
+ ],
+ "3/intermediate/unit_gym": [
+  "Full Body: back-squat×4, barbell-bench-press×4, barbell-row×2, deadlift×4, overhead-press×2, barbell-curl×3, cable-pushdown×1, smith-calf-raise×4, cable-crunch×4",
+  "Full Body: goblet-squat×4, incline-dumbbell-press×4, lat-pulldown×4, romanian-deadlift×4, machine-shoulder-press×2, dumbbell-curl×2, overhead-dumbbell-extension×1, single-leg-calf-raise×4, dead-bug×4",
+  "Full Body: dumbbell-walking-lunge×4, dumbbell-bench-press×4, seated-cable-row×4, dumbbell-romanian-deadlift×4, dumbbell-shoulder-press×2, cable-curl×2, bench-dip×1, smith-calf-raise×4, cable-crunch×4"
+ ],
+ "3/intermediate/bodyweight": [
+  "Full Body: split-squat×4, push-up×4, pull-up×4, sliding-leg-curl×4, pike-push-up×2, glute-bridge×2, bodyweight-curl×2, bench-dip×1, single-leg-calf-raise×4, hanging-knee-raise×4",
+  "Full Body: split-squat×4, push-up×4, inverted-row×4, sliding-leg-curl×4, pike-push-up×2, glute-bridge×2, bodyweight-curl×2, bench-dip×1, single-leg-calf-raise×4, dead-bug×4",
+  "Full Body: split-squat×4, push-up×4, pull-up×4, sliding-leg-curl×4, pike-push-up×2, glute-bridge×2, bodyweight-curl×2, bench-dip×1, single-leg-calf-raise×4, hanging-knee-raise×4"
+ ],
+ "3/advanced/full_gym": [
+  "Full Body: back-squat×4, barbell-bench-press×4, pull-up×3, deadlift×4, overhead-press×3, barbell-hip-thrust×1, leg-extension×1, cable-fly×1, leg-curl×1, barbell-curl×3, cable-pushdown×1, machine-calf-raise×5, cable-crunch×5",
+  "Full Body: leg-press×4, incline-dumbbell-press×4, barbell-row×4, romanian-deadlift×4, machine-shoulder-press×3, barbell-hip-thrust×1, sissy-squat×1, cable-fly×1, lat-pulldown×1, dumbbell-curl×3, overhead-dumbbell-extension×2, smith-calf-raise×5, hanging-knee-raise×5",
+  "Full Body: goblet-squat×4, dumbbell-bench-press×4, lat-pulldown×4, dumbbell-romanian-deadlift×4, dumbbell-shoulder-press×2, cable-curl×2, bench-dip×1, single-leg-calf-raise×4, dead-bug×4"
+ ],
+ "3/advanced/unit_gym": [
+  "Full Body: back-squat×4, barbell-bench-press×4, barbell-row×3, deadlift×4, overhead-press×3, barbell-hip-thrust×1, sissy-squat×1, cable-fly×1, sliding-leg-curl×1, barbell-curl×3, cable-pushdown×1, smith-calf-raise×5, cable-crunch×5",
+  "Full Body: goblet-squat×4, incline-dumbbell-press×4, lat-pulldown×4, romanian-deadlift×4, machine-shoulder-press×3, barbell-hip-thrust×1, sissy-squat×1, cable-fly×1, seated-cable-row×1, dumbbell-curl×3, overhead-dumbbell-extension×2, single-leg-calf-raise×5, dead-bug×5",
+  "Full Body: dumbbell-walking-lunge×4, dumbbell-bench-press×4, seated-cable-row×4, dumbbell-romanian-deadlift×4, dumbbell-shoulder-press×2, cable-curl×2, bench-dip×1, smith-calf-raise×4, cable-crunch×4"
+ ],
+ "3/advanced/bodyweight": [
+  "Full Body: split-squat×4, push-up×5, pull-up×4, sliding-leg-curl×5, pike-push-up×2, glute-bridge×3, sissy-squat×1, inverted-row×1, bodyweight-curl×2, bench-dip×1, single-leg-calf-raise×5, hanging-knee-raise×5",
+  "Full Body: split-squat×4, push-up×5, inverted-row×4, sliding-leg-curl×5, pike-push-up×3, glute-bridge×3, sissy-squat×1, pull-up×1, bodyweight-curl×3, bench-dip×1, single-leg-calf-raise×5, dead-bug×5",
+  "Full Body: split-squat×4, push-up×4, pull-up×4, sliding-leg-curl×4, pike-push-up×2, glute-bridge×2, bodyweight-curl×2, bench-dip×2, single-leg-calf-raise×4, hanging-knee-raise×4"
+ ],
+ "4/beginner/full_gym": [
+  "Upper: barbell-bench-press×4, pull-up×4, overhead-press×3, cable-fly×1, barbell-curl×3, cable-pushdown×1",
+  "Lower: back-squat×4, deadlift×4, barbell-hip-thrust×1, leg-extension×1, leg-curl×1, machine-calf-raise×5, cable-crunch×5",
+  "Upper: incline-dumbbell-press×4, barbell-row×4, machine-shoulder-press×3, cable-fly×1, dumbbell-curl×3, overhead-dumbbell-extension×2",
+  "Lower: leg-press×4, romanian-deadlift×4, barbell-hip-thrust×1, sissy-squat×1, smith-calf-raise×5, hanging-knee-raise×5"
+ ],
+ "4/beginner/unit_gym": [
+  "Upper: barbell-bench-press×4, barbell-row×4, overhead-press×3, cable-fly×1, barbell-curl×3, cable-pushdown×1",
+  "Lower: back-squat×4, deadlift×4, barbell-hip-thrust×1, sissy-squat×1, sliding-leg-curl×1, smith-calf-raise×5, cable-crunch×5",
+  "Upper: incline-dumbbell-press×4, lat-pulldown×4, machine-shoulder-press×3, cable-fly×1, dumbbell-curl×3, overhead-dumbbell-extension×2",
+  "Lower: goblet-squat×4, romanian-deadlift×4, barbell-hip-thrust×1, sissy-squat×1, single-leg-calf-raise×5, dead-bug×5"
+ ],
+ "4/beginner/bodyweight": [
+  "Upper: push-up×5, pull-up×4, pike-push-up×2, inverted-row×1, bodyweight-curl×2, bench-dip×2",
+  "Lower: split-squat×4, sliding-leg-curl×5, glute-bridge×3, sissy-squat×1, single-leg-calf-raise×5, hanging-knee-raise×5",
+  "Upper: push-up×5, inverted-row×4, pike-push-up×3, pull-up×1, bodyweight-curl×3, bench-dip×1",
+  "Lower: split-squat×4, sliding-leg-curl×5, glute-bridge×3, sissy-squat×1, single-leg-calf-raise×5, dead-bug×5"
+ ],
+ "4/intermediate/full_gym": [
+  "Upper: barbell-bench-press×4, pull-up×4, overhead-press×4, barbell-row×1, cable-fly×2, barbell-curl×3, cable-pushdown×2",
+  "Lower: back-squat×4, deadlift×4, barbell-hip-thrust×2, leg-extension×2, leg-curl×1, machine-calf-raise×6, cable-crunch×6",
+  "Upper: incline-dumbbell-press×4, barbell-row×4, machine-shoulder-press×4, lat-pulldown×1, cable-fly×2, dumbbell-curl×4, overhead-dumbbell-extension×2",
+  "Lower: leg-press×4, romanian-deadlift×4, barbell-hip-thrust×2, sissy-squat×2, sliding-leg-curl×1, smith-calf-raise×6, hanging-knee-raise×6"
+ ],
+ "4/intermediate/unit_gym": [
+  "Upper: barbell-bench-press×4, barbell-row×4, overhead-press×4, lat-pulldown×1, cable-fly×2, barbell-curl×3, cable-pushdown×2",
+  "Lower: back-squat×4, deadlift×4, barbell-hip-thrust×2, sissy-squat×2, sliding-leg-curl×1, smith-calf-raise×6, cable-crunch×6",
+  "Upper: incline-dumbbell-press×4, lat-pulldown×4, machine-shoulder-press×4, seated-cable-row×1, cable-fly×2, dumbbell-curl×4, overhead-dumbbell-extension×2",
+  "Lower: goblet-squat×4, romanian-deadlift×4, barbell-hip-thrust×2, sissy-squat×2, sliding-leg-curl×1, single-leg-calf-raise×6, dead-bug×6"
+ ],
+ "4/intermediate/bodyweight": [
+  "Upper: push-up×6, pull-up×4, pike-push-up×3, inverted-row×2, bodyweight-curl×3, bench-dip×2",
+  "Lower: split-squat×4, sliding-leg-curl×6, glute-bridge×4, sissy-squat×2, single-leg-calf-raise×6, hanging-knee-raise×6",
+  "Upper: push-up×6, inverted-row×4, pike-push-up×3, pull-up×2, bodyweight-curl×3, bench-dip×1",
+  "Lower: split-squat×4, sliding-leg-curl×6, glute-bridge×4, sissy-squat×2, single-leg-calf-raise×6, dead-bug×6"
+ ],
+ "4/advanced/full_gym": [
+  "Upper: barbell-bench-press×4, pull-up×4, overhead-press×4, barbell-row×2, cable-fly×3, dumbbell-lateral-raise×1, barbell-curl×4, cable-pushdown×3",
+  "Lower: back-squat×4, deadlift×4, barbell-hip-thrust×3, leg-extension×3, leg-curl×2, machine-calf-raise×7, cable-crunch×7",
+  "Upper: incline-dumbbell-press×4, barbell-row×4, machine-shoulder-press×4, lat-pulldown×2, cable-fly×3, face-pull×1, dumbbell-curl×4, overhead-dumbbell-extension×3",
+  "Lower: leg-press×4, romanian-deadlift×4, barbell-hip-thrust×3, sissy-squat×3, sliding-leg-curl×1, smith-calf-raise×7, hanging-knee-raise×7"
+ ],
+ "4/advanced/unit_gym": [
+  "Upper: barbell-bench-press×4, barbell-row×4, overhead-press×4, lat-pulldown×2, cable-fly×3, dumbbell-lateral-raise×1, barbell-curl×4, cable-pushdown×3",
+  "Lower: back-squat×4, deadlift×4, barbell-hip-thrust×3, sissy-squat×3, sliding-leg-curl×2, smith-calf-raise×7, cable-crunch×7",
+  "Upper: incline-dumbbell-press×4, lat-pulldown×4, machine-shoulder-press×4, seated-cable-row×2, cable-fly×3, face-pull×1, dumbbell-curl×4, overhead-dumbbell-extension×3",
+  "Lower: goblet-squat×4, romanian-deadlift×4, barbell-hip-thrust×3, sissy-squat×3, sliding-leg-curl×1, single-leg-calf-raise×7, dead-bug×7"
+ ],
+ "4/advanced/bodyweight": [
+  "Upper: push-up×7, pull-up×4, pike-push-up×3, inverted-row×3, bodyweight-curl×3, bench-dip×2",
+  "Lower: split-squat×4, sliding-leg-curl×7, glute-bridge×5, sissy-squat×3, single-leg-calf-raise×7, hanging-knee-raise×7",
+  "Upper: push-up×7, inverted-row×4, pike-push-up×4, pull-up×3, bodyweight-curl×4, bench-dip×2",
+  "Lower: split-squat×4, sliding-leg-curl×7, glute-bridge×5, sissy-squat×3, single-leg-calf-raise×7, dead-bug×7"
+ ],
+ "5/beginner/full_gym": [
+  "Push: barbell-bench-press×4, overhead-press×1, incline-dumbbell-press×1, cable-pushdown×2",
+  "Pull: pull-up×3, dumbbell-lateral-raise×4, barbell-curl×3, cable-crunch×4",
+  "Legs: back-squat×4, deadlift×4, barbell-hip-thrust×1, leg-extension×1, leg-curl×1, machine-calf-raise×5, cable-crunch×3",
+  "Upper: barbell-bench-press×4, pull-up×3, overhead-press×1, cable-fly×1, barbell-curl×4, cable-pushdown×3",
+  "Lower: back-squat×4, deadlift×4, barbell-hip-thrust×1, leg-extension×1, machine-calf-raise×5, cable-crunch×3"
+ ],
+ "5/beginner/unit_gym": [
+  "Push: barbell-bench-press×4, overhead-press×1, incline-dumbbell-press×1, cable-pushdown×2",
+  "Pull: barbell-row×3, dumbbell-lateral-raise×4, barbell-curl×3, cable-crunch×4",
+  "Legs: back-squat×4, deadlift×4, barbell-hip-thrust×1, sissy-squat×1, sliding-leg-curl×1, smith-calf-raise×5, cable-crunch×3",
+  "Upper: barbell-bench-press×4, barbell-row×3, overhead-press×1, cable-fly×1, barbell-curl×4, cable-pushdown×3",
+  "Lower: back-squat×4, deadlift×4, barbell-hip-thrust×1, sissy-squat×1, smith-calf-raise×5, cable-crunch×3"
+ ],
+ "5/beginner/bodyweight": [
+  "Push: push-up×5, pike-push-up×1, bench-dip×2",
+  "Pull: pull-up×4, inverted-row×1, pike-push-up×3, bodyweight-curl×2, hanging-knee-raise×4",
+  "Legs: split-squat×4, sliding-leg-curl×5, glute-bridge×3, sissy-squat×1, single-leg-calf-raise×5, hanging-knee-raise×3",
+  "Upper: push-up×5, pull-up×4, pike-push-up×1, inverted-row×1, bodyweight-curl×3, bench-dip×1",
+  "Lower: split-squat×4, sliding-leg-curl×5, glute-bridge×3, sissy-squat×1, single-leg-calf-raise×5, hanging-knee-raise×3"
+ ],
+ "5/intermediate/full_gym": [
+  "Push: barbell-bench-press×4, overhead-press×1, incline-dumbbell-press×2, cable-pushdown×3",
+  "Pull: pull-up×4, dumbbell-lateral-raise×4, barbell-curl×4, cable-crunch×4",
+  "Legs: back-squat×4, deadlift×4, barbell-hip-thrust×2, leg-extension×2, leg-curl×1, machine-calf-raise×6, cable-crunch×4",
+  "Upper: barbell-bench-press×4, pull-up×4, overhead-press×2, cable-fly×2, barbell-curl×4, cable-pushdown×3",
+  "Lower: back-squat×4, deadlift×4, barbell-hip-thrust×2, leg-extension×2, leg-curl×1, machine-calf-raise×6, cable-crunch×4"
+ ],
+ "5/intermediate/unit_gym": [
+  "Push: barbell-bench-press×4, overhead-press×1, incline-dumbbell-press×2, cable-pushdown×3",
+  "Pull: barbell-row×4, dumbbell-lateral-raise×4, barbell-curl×4, cable-crunch×4",
+  "Legs: back-squat×4, deadlift×4, barbell-hip-thrust×2, sissy-squat×2, sliding-leg-curl×1, smith-calf-raise×6, cable-crunch×4",
+  "Upper: barbell-bench-press×4, barbell-row×4, overhead-press×2, cable-fly×2, barbell-curl×4, cable-pushdown×3",
+  "Lower: back-squat×4, deadlift×4, barbell-hip-thrust×2, sissy-squat×2, sliding-leg-curl×1, smith-calf-raise×6, cable-crunch×4"
+ ],
+ "5/intermediate/bodyweight": [
+  "Push: push-up×6, pike-push-up×1, bench-dip×2",
+  "Pull: pull-up×4, inverted-row×2, pike-push-up×4, bodyweight-curl×3, hanging-knee-raise×4",
+  "Legs: split-squat×4, sliding-leg-curl×6, glute-bridge×4, sissy-squat×2, single-leg-calf-raise×6, hanging-knee-raise×4",
+  "Upper: push-up×6, pull-up×4, pike-push-up×1, inverted-row×2, bodyweight-curl×3, bench-dip×1",
+  "Lower: split-squat×4, sliding-leg-curl×6, glute-bridge×4, sissy-squat×2, single-leg-calf-raise×6, hanging-knee-raise×4"
+ ],
+ "5/advanced/full_gym": [
+  "Push: barbell-bench-press×4, overhead-press×1, incline-dumbbell-press×3, cable-pushdown×3",
+  "Pull: pull-up×4, barbell-row×1, dumbbell-lateral-raise×5, barbell-curl×4, cable-crunch×5",
+  "Legs: back-squat×4, deadlift×4, barbell-hip-thrust×3, leg-extension×3, leg-curl×2, machine-calf-raise×7, cable-crunch×5",
+  "Upper: barbell-bench-press×4, pull-up×4, overhead-press×3, barbell-row×1, cable-fly×3, barbell-curl×5, cable-pushdown×4",
+  "Lower: back-squat×4, deadlift×4, barbell-hip-thrust×3, leg-extension×3, leg-curl×1, machine-calf-raise×7, cable-crunch×4"
+ ],
+ "5/advanced/unit_gym": [
+  "Push: barbell-bench-press×4, overhead-press×1, incline-dumbbell-press×3, cable-pushdown×3",
+  "Pull: barbell-row×4, lat-pulldown×1, dumbbell-lateral-raise×5, barbell-curl×4, cable-crunch×5",
+  "Legs: back-squat×4, deadlift×4, barbell-hip-thrust×3, sissy-squat×3, sliding-leg-curl×2, smith-calf-raise×7, cable-crunch×5",
+  "Upper: barbell-bench-press×4, barbell-row×4, overhead-press×3, lat-pulldown×1, cable-fly×3, barbell-curl×5, cable-pushdown×4",
+  "Lower: back-squat×4, deadlift×4, barbell-hip-thrust×3, sissy-squat×3, sliding-leg-curl×1, smith-calf-raise×7, cable-crunch×4"
+ ],
+ "5/advanced/bodyweight": [
+  "Push: push-up×7, pike-push-up×1, bench-dip×2",
+  "Pull: pull-up×4, inverted-row×3, pike-push-up×4, bodyweight-curl×3, hanging-knee-raise×5",
+  "Legs: split-squat×4, sliding-leg-curl×7, glute-bridge×5, sissy-squat×3, single-leg-calf-raise×7, hanging-knee-raise×5",
+  "Upper: push-up×7, pull-up×4, pike-push-up×2, inverted-row×3, bodyweight-curl×4, bench-dip×2",
+  "Lower: split-squat×4, sliding-leg-curl×7, glute-bridge×5, sissy-squat×3, single-leg-calf-raise×7, hanging-knee-raise×4"
+ ],
+ "6/beginner/full_gym": [
+  "Push: barbell-bench-press×4, incline-dumbbell-press×1, cable-pushdown×2",
+  "Pull: pull-up×4, dumbbell-lateral-raise×3, barbell-curl×3, cable-crunch×3",
+  "Legs: back-squat×4, deadlift×4, barbell-hip-thrust×1, leg-extension×1, leg-curl×1, machine-calf-raise×5, cable-crunch×3",
+  "Push: incline-dumbbell-press×4, dumbbell-bench-press×1, overhead-dumbbell-extension×3",
+  "Pull: barbell-row×4, face-pull×2, dumbbell-curl×3, hanging-knee-raise×2",
+  "Legs: leg-press×4, romanian-deadlift×4, barbell-hip-thrust×1, sissy-squat×1, smith-calf-raise×5, hanging-knee-raise×2"
+ ],
+ "6/beginner/unit_gym": [
+  "Push: barbell-bench-press×4, incline-dumbbell-press×1, cable-pushdown×2",
+  "Pull: barbell-row×4, dumbbell-lateral-raise×3, barbell-curl×3, cable-crunch×3",
+  "Legs: back-squat×4, deadlift×4, barbell-hip-thrust×1, sissy-squat×1, sliding-leg-curl×1, smith-calf-raise×5, cable-crunch×3",
+  "Push: incline-dumbbell-press×4, dumbbell-bench-press×1, overhead-dumbbell-extension×3",
+  "Pull: lat-pulldown×4, face-pull×2, dumbbell-curl×3, dead-bug×2",
+  "Legs: goblet-squat×4, romanian-deadlift×4, barbell-hip-thrust×1, sissy-squat×1, single-leg-calf-raise×5, dead-bug×2"
+ ],
+ "6/beginner/bodyweight": [
+  "Push: push-up×5, bench-dip×2",
+  "Pull: pull-up×4, inverted-row×1, pike-push-up×3, bodyweight-curl×2, hanging-knee-raise×3",
+  "Legs: split-squat×4, sliding-leg-curl×5, glute-bridge×3, sissy-squat×1, single-leg-calf-raise×5, hanging-knee-raise×3",
+  "Push: push-up×5, bench-dip×1",
+  "Pull: inverted-row×4, pull-up×1, pike-push-up×2, bodyweight-curl×3, dead-bug×2",
+  "Legs: split-squat×4, sliding-leg-curl×5, glute-bridge×3, sissy-squat×1, single-leg-calf-raise×5, dead-bug×2"
+ ],
+ "6/intermediate/full_gym": [
+  "Push: barbell-bench-press×4, incline-dumbbell-press×2, cable-pushdown×3",
+  "Pull: pull-up×4, barbell-row×1, dumbbell-lateral-raise×3, barbell-curl×3, cable-crunch×3",
+  "Legs: back-squat×4, deadlift×4, barbell-hip-thrust×2, leg-extension×2, leg-curl×1, machine-calf-raise×6, cable-crunch×3",
+  "Push: incline-dumbbell-press×4, dumbbell-bench-press×2, overhead-dumbbell-extension×3",
+  "Pull: barbell-row×4, lat-pulldown×1, face-pull×3, dumbbell-curl×4, hanging-knee-raise×3",
+  "Legs: leg-press×4, romanian-deadlift×4, barbell-hip-thrust×2, sissy-squat×2, sliding-leg-curl×1, smith-calf-raise×6, hanging-knee-raise×3"
+ ],
+ "6/intermediate/unit_gym": [
+  "Push: barbell-bench-press×4, incline-dumbbell-press×2, cable-pushdown×3",
+  "Pull: barbell-row×4, lat-pulldown×1, dumbbell-lateral-raise×3, barbell-curl×3, cable-crunch×3",
+  "Legs: back-squat×4, deadlift×4, barbell-hip-thrust×2, sissy-squat×2, sliding-leg-curl×1, smith-calf-raise×6, cable-crunch×3",
+  "Push: incline-dumbbell-press×4, dumbbell-bench-press×2, overhead-dumbbell-extension×3",
+  "Pull: lat-pulldown×4, seated-cable-row×1, face-pull×3, dumbbell-curl×4, dead-bug×3",
+  "Legs: goblet-squat×4, romanian-deadlift×4, barbell-hip-thrust×2, sissy-squat×2, sliding-leg-curl×1, single-leg-calf-raise×6, dead-bug×3"
+ ],
+ "6/intermediate/bodyweight": [
+  "Push: push-up×6, bench-dip×2",
+  "Pull: pull-up×4, inverted-row×2, pike-push-up×3, bodyweight-curl×3, hanging-knee-raise×3",
+  "Legs: split-squat×4, sliding-leg-curl×6, glute-bridge×4, sissy-squat×2, single-leg-calf-raise×6, hanging-knee-raise×3",
+  "Push: push-up×6, bench-dip×1",
+  "Pull: inverted-row×4, pull-up×2, pike-push-up×3, bodyweight-curl×3, dead-bug×3",
+  "Legs: split-squat×4, sliding-leg-curl×6, glute-bridge×4, sissy-squat×2, single-leg-calf-raise×6, dead-bug×3"
+ ],
+ "6/advanced/full_gym": [
+  "Push: barbell-bench-press×4, incline-dumbbell-press×3, cable-pushdown×3",
+  "Pull: pull-up×4, barbell-row×2, dumbbell-lateral-raise×4, barbell-curl×4, cable-crunch×4",
+  "Legs: back-squat×4, deadlift×4, barbell-hip-thrust×3, leg-extension×3, leg-curl×2, machine-calf-raise×7, cable-crunch×4",
+  "Push: incline-dumbbell-press×4, dumbbell-bench-press×3, overhead-dumbbell-extension×4",
+  "Pull: barbell-row×4, lat-pulldown×2, face-pull×3, dumbbell-curl×4, hanging-knee-raise×3",
+  "Legs: leg-press×4, romanian-deadlift×4, barbell-hip-thrust×3, sissy-squat×3, sliding-leg-curl×1, smith-calf-raise×7, hanging-knee-raise×3"
+ ],
+ "6/advanced/unit_gym": [
+  "Push: barbell-bench-press×4, incline-dumbbell-press×3, cable-pushdown×3",
+  "Pull: barbell-row×4, lat-pulldown×2, dumbbell-lateral-raise×4, barbell-curl×4, cable-crunch×4",
+  "Legs: back-squat×4, deadlift×4, barbell-hip-thrust×3, sissy-squat×3, sliding-leg-curl×2, smith-calf-raise×7, cable-crunch×4",
+  "Push: incline-dumbbell-press×4, dumbbell-bench-press×3, overhead-dumbbell-extension×4",
+  "Pull: lat-pulldown×4, seated-cable-row×2, face-pull×3, dumbbell-curl×4, dead-bug×3",
+  "Legs: goblet-squat×4, romanian-deadlift×4, barbell-hip-thrust×3, sissy-squat×3, sliding-leg-curl×1, single-leg-calf-raise×7, dead-bug×3"
+ ],
+ "6/advanced/bodyweight": [
+  "Push: push-up×7, bench-dip×2",
+  "Pull: pull-up×4, inverted-row×3, pike-push-up×4, bodyweight-curl×3, hanging-knee-raise×4",
+  "Legs: split-squat×4, sliding-leg-curl×7, glute-bridge×5, sissy-squat×3, single-leg-calf-raise×7, hanging-knee-raise×4",
+  "Push: push-up×7, bench-dip×2",
+  "Pull: inverted-row×4, pull-up×3, pike-push-up×3, bodyweight-curl×4, dead-bug×3",
+  "Legs: split-squat×4, sliding-leg-curl×7, glute-bridge×5, sissy-squat×3, single-leg-calf-raise×7, dead-bug×3"
+ ]
+}

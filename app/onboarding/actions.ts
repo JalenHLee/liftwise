@@ -3,6 +3,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isValid, validateOnboarding, type OnboardingErrors, type OnboardingInput } from "@/lib/onboarding/validation";
+import type { SplitId } from "@/lib/engine/templates";
+import type { EquipmentSetup, Experience } from "@/lib/engine/types";
+import { generateProgram } from "@/lib/program/program";
+import { saveProgramRow } from "@/lib/program/supabase";
 
 export async function saveOnboarding(input: OnboardingInput): Promise<{ errors: OnboardingErrors }> {
   const errors = validateOnboarding(input);
@@ -50,6 +54,17 @@ export async function saveOnboarding(input: OnboardingInput): Promise<{ errors: 
     if (weightsError) {
       return { errors: { form: weightsError.message } };
     }
+  }
+
+  // The user's program, generated from the split they chose.
+  const program = generateProgram(input.split as SplitId, {
+    daysPerWeek: input.daysPerWeek,
+    experience: input.experience as Experience,
+    equipment: input.equipment as EquipmentSetup,
+  });
+  const { error: programError } = await saveProgramRow(supabase, user.id, { ...program, rotation_reset_at: null });
+  if (programError) {
+    return { errors: { form: programError } };
   }
 
   redirect("/today");
