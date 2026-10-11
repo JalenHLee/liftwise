@@ -1,5 +1,6 @@
 import { isPlausibleLocalDate, toEngineCheckIn } from "@/lib/checkin/logic";
 import { rowToSaved, type CheckinRow } from "@/lib/checkin/save";
+import { historyByExercise, weeklyBests, type SetLog } from "@/lib/engine/history";
 import type { RecentSet } from "@/lib/engine/startingLoad";
 import { EQUIPMENT_SETUPS, EXPERIENCES, GOALS, type EquipmentSetup, type Experience, type Goal, type Readiness } from "@/lib/engine/types";
 import type { AiClient } from "./ai";
@@ -25,6 +26,8 @@ export type BuildContext = {
   sessions: { session_date: string; day_index: number; is_deload: boolean; build_count: number; updated_at: string }[];
   /** Check-ins from the last 7 days, today included. */
   recentCheckins: { checkin_date: string; readiness_level: string }[];
+  /** Recent logged sets up to and including today, finished sessions or not. */
+  setLogs: SetLog[];
 };
 
 /** One row of the `sessions` table (see supabase/migrations/0004_sessions.sql). */
@@ -92,6 +95,10 @@ export async function buildSessionForUser(
     return { error: "You've rebuilt today's session 3 times, which is the daily limit. It's saved as it is." };
   }
 
+  if (ctx.setLogs.some((l) => l.sessionDate === date)) {
+    return { error: "You've started logging today's session, so it stays as it is." };
+  }
+
   const profile = { goal: p.goal, experience: p.experience, equipment: p.equipment };
   const resolved = resolveProgram(ctx.program, { ...profile, daysPerWeek: p.days_per_week });
   const { program } = resolved;
@@ -113,6 +120,8 @@ export async function buildSessionForUser(
   const dayIndex =
     request.dayIndex ??
     rotationFor({ sessions: ctx.sessions, today: date, dayCount: program.days.length, rotationResetAt: resolved.rotationResetAt }).dayIndex;
+  // Today's own sets never count (the session is locked once logging starts anyway).
+  const pastLogs = ctx.setLogs.filter((l) => dayNumber(l.sessionDate) < dayNumber(date));
   const deload = deloadToday({
     today: date,
     sessionDates: earlier.map((s) => s.session_date),
@@ -120,13 +129,14 @@ export async function buildSessionForUser(
     checkIns: ctx.recentCheckins.flatMap((c) =>
       c.readiness_level === "green" || c.readiness_level === "yellow" || c.readiness_level === "red" ? [{ date: c.checkin_date, level: c.readiness_level }] : [],
     ),
+    weeklyBests: weeklyBests(pastLogs, date),
   });
   const startingWeights: Record<string, RecentSet> = Object.fromEntries(
     ctx.startingWeights.map((w) => [w.exercise_id, { weightKg: Number(w.weight_kg), reps: w.reps ?? DEFAULT_STARTING_REPS }]),
   );
 
   const result = await generateSession(
-    { profile, program, dayIndex, checkIn: toEngineCheckIn(saved.form), note: saved.form.note, startingWeights, deload },
+    { profile, program, dayIndex, checkIn: toEngineCheckIn(saved.form), note: saved.form.note, startingWeights, history: historyByExercise(pastLogs), deload },
     ai,
   );
 

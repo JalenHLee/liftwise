@@ -2,21 +2,30 @@ import type { SessionExercise, SessionPlan } from "./types";
 
 const range = (min: number, max: number) => (min === max ? `${min}` : `${min}–${max}`);
 
-/** True when the user picks the weight (calibration) or it's bodyweight: we show the rep range, not a single target. */
-export const isCalibrating = (e: SessionExercise) => e.load.kind !== "weight";
+/**
+ * True when there's no single rep target to show: calibration (the user picks the weight) or
+ * bodyweight without history. We show the rep range instead.
+ */
+export const isCalibrating = (e: SessionExercise) => e.targetReps === undefined && e.load.kind !== "weight";
+
+/** Reps to aim for on each set: progression's target, else the top of the range (the starting weight was worked out for it). */
+export const targetReps = (e: SessionExercise) => e.targetReps ?? e.repMax;
 
 /**
- * The big serif line. With a starting weight, the target is the top of the range (the weight
- * was worked out for it): "3 × 10". Calibration and bodyweight show the range: "3 × 5–10".
+ * The big serif line. With a weight or a progression target: "3 × 10" (or "3 × 8" when aiming
+ * for one more rep). Calibration and first-time bodyweight show the range: "3 × 5–10".
  */
 export function setsByReps(e: SessionExercise): string {
-  return `${e.sets} × ${isCalibrating(e) ? range(e.repMin, e.repMax) : e.repMax}`;
+  return `${e.sets} × ${isCalibrating(e) ? range(e.repMin, e.repMax) : targetReps(e)}`;
 }
 
-export const repsPerSet = (e: SessionExercise) => `${isCalibrating(e) ? range(e.repMin, e.repMax) : e.repMax} reps`;
+export const repsPerSet = (e: SessionExercise) => `${isCalibrating(e) ? range(e.repMin, e.repMax) : targetReps(e)} reps`;
+
+/** "62.5" or "60": kilograms without trailing zeros. */
+export const formatKg = (kg: number) => (Number.isInteger(kg) ? `${kg}` : `${Math.round(kg * 100) / 100}`);
 
 export function weightLabel(e: SessionExercise): string | null {
-  if (e.load.kind === "weight") return `${Number.isInteger(e.load.kg) ? e.load.kg : e.load.kg.toFixed(1)} kg`;
+  if (e.load.kind === "weight") return `${formatKg(e.load.kg)} kg`;
   if (e.load.kind === "bodyweight") return "Bodyweight";
   return null;
 }

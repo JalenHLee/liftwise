@@ -16,6 +16,7 @@ const context = (patch: Partial<BuildContext> = {}): BuildContext => ({
   program: null,
   sessions: [],
   recentCheckins: [],
+  setLogs: [],
   ...patch,
 });
 
@@ -115,7 +116,7 @@ describe("building and saving today's session", () => {
     const raw = JSON.stringify({ swaps: [], addedPainAreas: [], addedSoreness: [], explanations: [], daySummary: "Good to go." });
     const { store, saved } = storeWith(context());
     await buildSessionForUser(store, "user-1", { date: DATE }, async () => raw, NOW);
-    expect(saved[0]).toMatchObject({ source: "ai", model: "claude-sonnet-5", prompt_version: "session-v1", ai_raw_output: raw });
+    expect(saved[0]).toMatchObject({ source: "ai", model: "claude-sonnet-5", prompt_version: "session-v2", ai_raw_output: raw });
   });
 
   test("passes the check-in note to Claude", async () => {
@@ -218,5 +219,63 @@ describe("check-in changed notice", () => {
     expect(checkinChangedSince("2026-10-09T08:00:00Z", "2026-10-09T08:00:00Z")).toBe(false);
     expect(checkinChangedSince("2026-10-09T08:00:00Z", "2026-10-09T08:05:00Z")).toBe(true);
     expect(checkinChangedSince("2026-10-09T08:00:00+00:00", "2026-10-09T08:00:00.000Z")).toBe(false);
+  });
+});
+
+describe("slice 6: logged sets drive the build", () => {
+  const setLog = (exerciseId: string, sessionDate: string, setNumber: number, weightKg: number, reps: number, isDeload = false) => ({
+    exerciseId,
+    sessionDate,
+    isDeload,
+    setNumber,
+    weightKg,
+    reps,
+    rir: 2,
+    loggedAt: `${sessionDate}T10:00:00Z`,
+  });
+  const fourSets = (id: string, date: string, kg: number, reps: number) => [1, 2, 3, 4].map((n) => setLog(id, date, n, kg, reps));
+
+  test("once a set is logged today, the session can't be rebuilt (or switched to another day)", async () => {
+    const { store, saved } = storeWith(context({ sessions: [session(DATE, 0)], setLogs: [setLog("barbell-bench-press", DATE, 1, 60, 8)] }));
+    expect(await buildSessionForUser(store, "user-1", { date: DATE }, null, NOW)).toEqual({ error: "You've started logging today's session, so it stays as it is." });
+    expect(await buildSessionForUser(store, "user-1", { date: DATE, dayIndex: 1 }, null, NOW)).toHaveProperty("error");
+    expect(saved).toHaveLength(0);
+  });
+
+  test("progression uses logged sets from a session that was never marked finished", async () => {
+    // The store hands over every logged set, finished or not; nothing filters on completed_at.
+    const { store, saved } = storeWith(context({ sessions: [session("2026-10-05", 3)], setLogs: fourSets("barbell-bench-press", "2026-10-05", 60, 10) }));
+    await buildSessionForUser(store, "user-1", { date: DATE }, null, NOW);
+    const bench = saved[0].plan.exercises.find((e) => e.exerciseId === "barbell-bench-press")!;
+    // History beats the onboarding starting weight (80 × 5 -> 65 kg).
+    expect(bench.load).toEqual({ kind: "weight", kg: 62.5 });
+    expect(bench.tags).toContain("+2.5 KG");
+  });
+
+  test("a yellow day holds the increase that history made due", async () => {
+    const checkin = { ...formToRow(DATE, { ...defaultForm(60), sleepHours: 5.5 }), id: "checkin-1", updated_at: "2026-10-09T08:00:00Z" };
+    const { store, saved } = storeWith(context({ checkin, sessions: [session("2026-10-05", 3)], setLogs: fourSets("barbell-bench-press", "2026-10-05", 60, 10) }));
+    await buildSessionForUser(store, "user-1", { date: DATE }, null, NOW);
+    const bench = saved[0].plan.exercises.find((e) => e.exerciseId === "barbell-bench-press")!;
+    expect(bench.load).toEqual({ kind: "weight", kg: 60 });
+    expect(bench.tags).toContain("HELD · WAS DUE +2.5 KG");
+  });
+
+  test("two key lifts stalled for 2 weeks (finished sessions or not) -> deload week", async () => {
+    // Weeks of 2026-09-14, 09-21, 09-28: squat and bench never beat week 1.
+    const stalled = (id: string) => [
+      ...fourSets(id, "2026-09-15", 100, 6),
+      ...fourSets(id, "2026-09-22", 100, 6),
+      ...fourSets(id, "2026-09-29", 100, 5),
+    ];
+    const { store, saved } = storeWith(
+      context({
+        sessions: [session("2026-09-15", 0), session("2026-09-22", 1), session("2026-09-29", 2)],
+        setLogs: [...stalled("back-squat"), ...stalled("barbell-bench-press")],
+      }),
+    );
+    await buildSessionForUser(store, "user-1", { date: DATE }, null, NOW);
+    expect(saved[0].is_deload).toBe(true);
+    expect(saved[0].plan.deload.reasons).toContain("2 or more key lifts have stalled for 2 weeks");
   });
 });

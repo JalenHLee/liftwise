@@ -16,6 +16,10 @@ export type SessionExercise = PlannedExercise & {
   explanation: string | null;
   /** Set when Claude swapped this in; the id of the exercise it replaced. */
   swappedFrom?: string;
+  /** Reps to aim for on every set, from double progression on this exercise's logged history. */
+  targetReps?: number;
+  /** The progression tag in `tags` (e.g. "+2.5 KG"), so a swap can replace it with its own. */
+  progressionTag?: string;
 };
 
 export type SessionPlan = {

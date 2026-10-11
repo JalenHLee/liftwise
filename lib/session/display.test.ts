@@ -51,3 +51,18 @@ describe("session display", () => {
     expect(readinessTags(plan)).toEqual(["deload week", "5.5h sleep", "note: lower back pain", "note: sore chest"]);
   });
 });
+
+describe("progression targets (slice 6)", () => {
+  test("a progression rep target replaces the top of the range, with the range in small mono", () => {
+    const e = { ...base, targetReps: 8 };
+    expect(setsByReps(e)).toBe("3 × 8");
+    expect(repsPerSet(e)).toBe("8 reps");
+    expect(details(e)[0]).toBe("Range 5–10");
+  });
+
+  test("bodyweight with history shows its rep target", () => {
+    const e: SessionExercise = { ...base, load: { kind: "bodyweight" }, targetReps: 11 };
+    expect(setsByReps(e)).toBe("3 × 11");
+    expect(details(e)[0]).toBe("Range 5–10");
+  });
+});

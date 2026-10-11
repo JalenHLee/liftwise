@@ -176,6 +176,15 @@ Owner-approved clarifications of the rules above. Follow these; ask before chang
 23. The Program screen can change days per week and the split; both regenerate the program after a confirmation. Goal, equipment and experience wait for a later profile editor.
 24. Replacing the program restarts the rotation at day 1. A session already built today stays as it is until it's rebuilt.
 25. Tradeoff notes show weekly sets as whole numbers, and a miss of less than 1 set a week (below or above the band) counts as meeting the target, so no note. The engine's program check keeps the exact numbers (used by tests).
+26. Rebuilds lock once the first set of today's session is logged (this also blocks "Change day" for today).
+27. A logged set can be tapped to correct it, or deleted if it was logged by mistake. Exercises can be skipped (and un-skipped).
+28. A finished session is read-only, with "Resume workout" on the same local day only. Partial sessions are allowed.
+29. Progression and the stalled-lifts deload use every logged set, whether or not the session was marked finished.
+30. Stall weeks run Monday–Sunday in the user's local time. Only finished weeks count (not the current one); a week without the lift is left out, not counted as a stall; deload sessions are ignored.
+31. Logging prefills the planned weight (or the weight used on the previous set), the rep target and the RIR pill at the target's low end, so an on-plan set is one tap. RIR "4+" is stored as 4.
+32. Progression's working weight is the first set's weight; a set done lighter doesn't count as hitting the top of the range. Deload sessions are ignored by progression; yellow and red sessions count. Progression is judged against the program's prescription, not the day's eased RIR.
+33. Exercises with logged history use progression instead of starting weights or calibration. On yellow, red and deload days a due increase shows "HELD · WAS DUE +X KG"; at the equipment's heaviest weight it shows "AT MAX WEIGHT". The big number shows the engine's rep target (e.g. "3 × 8").
+34. Sets are saved on the phone first (with an id made on the phone, so retries never duplicate) and retried straight away, every 15 s, when the signal returns and when the app reopens. Finishing waits until every set has reached the server.
 
 Engine assumptions made while building slice 2 (not yet confirmed by the owner):
 - Bodyweight setup assumes a pull-up bar and a sturdy low bar or table (for rows and curls).
@@ -187,7 +196,7 @@ Engine assumptions made while building slice 2 (not yet confirmed by the owner):
 - Onboarding values: goal = strength / muscle / general (only strength changes rep ranges); energy and soreness are scored 1–5.
 
 ## Status
-Current: slice 5c (programs as data + split choice + today's-day switcher) done. Each user's active program is stored in `programs` (name, source template/custom, split, ordered days of exercise IDs with sets and optional rep-range overrides). Templates are generators over the existing week builder (identical output for every existing combination, checked against a frozen fixture). Sessions build from the stored program day; users from before 5c get their recommended program saved the first time it's needed, so nothing changes for them. Onboarding has a Split step after days per week, with "Recommended" and honest notes from the engine's program check (average frequency/volume for rolling splits). A Program screen (linked from Today) changes days per week and split, with a confirmation; the rotation restarts at day 1. Today shows "Today: Lower · next in your rotation" with "Change day"; a pick after building is a rebuild (counts toward the limit). Earlier: slice 5b session generation (engine → Claude → validator, rules-only fallback). The deload "stalled lifts" trigger and progression from logged sets wait for slice 6. Next: slice 6 (set logging with editable weight + progression + end-of-workout rating and note).
+Current: slice 6 (set logging + progression) done. On the Session screen each set row is loggable: weight −/+ by the exercise's increment (or typed), reps −/+ (or typed), and a quick RIR pick, all prefilled so an on-plan set is one tap on "Log set". Calibration exercises take the weight on set 1 and later sets follow it. A calm rest bar starts after each set (Skip to close). Logged sets can be corrected or deleted; exercises can be skipped. Every set is saved on the phone first and synced to `set_logs` with automatic retry ("Saving…", "Saved", "On phone"). "Finish workout" opens "How did it go?" (rating 1–5, optional note, summary of sets, volume and lifts) and marks the session finished; "Resume workout" reopens it the same day. The next session's weight and rep target come from double progression on each exercise's logged history (finished or not); yellow/red/deload days hold increases with "HELD · WAS DUE +X KG"; the "2+ key lifts stalled for 2 weeks" deload trigger is live. Earlier: 5c programs as data, 5b session generation. Next: slice 7 (coach chat).
 
 Manual steps needed in Supabase (SQL Editor), in order:
 1. `supabase/migrations/0001_profiles_and_onboarding.sql` (if not already run), and confirm email confirmations are off (Authentication → Providers → Email).
@@ -195,5 +204,6 @@ Manual steps needed in Supabase (SQL Editor), in order:
 3. `supabase/migrations/0003_starting_weights_reps.sql` (adds the `reps` column to `starting_weights`; run it before testing the onboarding preview).
 4. `supabase/migrations/0004_sessions.sql` (the `sessions` table with Row Level Security).
 5. `supabase/migrations/0005_programs.sql` (the `programs` table with Row Level Security; also lets `sessions.template` be 'custom' for slice 8).
+6. `supabase/migrations/0006_set_logs.sql` (the `set_logs` table with Row Level Security, plus finished time, rating, note and skipped exercises on `sessions`; run it before testing slice 6).
 
 Vercel: set `ANTHROPIC_API_KEY` (Settings → Environment Variables, Preview and Production). Without it every session uses the rules-only plan.

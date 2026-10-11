@@ -130,6 +130,7 @@ export function checkInvariants(engine: SessionPlan, final: SessionPlan, painAre
       if (e[field] !== base[field]) errors.push(`${e.name}: ${field} changed from ${base[field]} to ${e[field]}`);
     }
     if (!e.swappedFrom && JSON.stringify(e.load) !== JSON.stringify(base.load)) errors.push(`${e.name}: weight changed`);
+    if (!e.swappedFrom && e.targetReps !== base.targetReps) errors.push(`${e.name}: rep target changed`);
     if (exercise.loadsAreas.some((a) => painAreas.includes(a))) errors.push(`${e.name} loads a painful area`);
   });
 

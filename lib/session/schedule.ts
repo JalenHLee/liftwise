@@ -1,4 +1,4 @@
-import { checkDeload, DELOAD_EVERY_WEEKS } from "@/lib/engine/deload";
+import { checkDeload, DELOAD_EVERY_WEEKS, type WeeklyBest } from "@/lib/engine/deload";
 import type { Readiness } from "@/lib/engine/types";
 
 /** ISO date (YYYY-MM-DD) -> whole days since 1970, ignoring time zones. */
@@ -53,13 +53,15 @@ export type DeloadHistory = {
   deloadDates: string[];
   /** Check-ins from the last 7 days, today included. */
   checkIns: { date: string; level: Readiness }[];
+  /** Best set per finished week for each lift, from logged sets (see `weeklyBests`). */
+  weeklyBests?: Record<string, WeeklyBest[]>;
 };
 
 /**
  * Deload decision for today. "Every 6th week" counts from the start of the last deload
  * week (decision 12) or, if there has never been one, from the first session.
  * A deload lasts a week, so the 7 days from its start stay deload days.
- * The stalled-lifts trigger needs logged sets, so it starts working in slice 6.
+ * The stalled-lifts trigger uses the weekly bests from logged sets.
  */
 export function deloadToday(h: DeloadHistory): { deload: boolean; reasons: string[] } {
   const today = dayNumber(h.today);
@@ -79,7 +81,7 @@ export function deloadToday(h: DeloadHistory): { deload: boolean; reasons: strin
 
   return checkDeload({
     weekSinceLastDeload: Math.min(weekSinceLastDeload, DELOAD_EVERY_WEEKS),
-    weeklyBests: {},
+    weeklyBests: h.weeklyBests ?? {},
     checkIns: h.checkIns,
     today: h.today,
   });
