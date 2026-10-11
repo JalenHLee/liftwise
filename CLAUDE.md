@@ -175,6 +175,7 @@ Owner-approved clarifications of the rules above. Follow these; ask before chang
     - For a rolling split the builder aims the *average* week at the weekly band, and the program check reports average weekly frequency and volume (PPL on 4 days ≈ 1.3× a week per muscle). Tradeoff notes are built only from that check, never written per split.
 23. The Program screen can change days per week and the split; both regenerate the program after a confirmation. Goal, equipment and experience wait for a later profile editor.
 24. Replacing the program restarts the rotation at day 1. A session already built today stays as it is until it's rebuilt.
+25. Tradeoff notes show weekly sets as whole numbers, and a miss of less than 1 set a week (below or above the band) counts as meeting the target, so no note. The engine's program check keeps the exact numbers (used by tests).
 
 Engine assumptions made while building slice 2 (not yet confirmed by the owner):
 - Bodyweight setup assumes a pull-up bar and a sturdy low bar or table (for rows and curls).

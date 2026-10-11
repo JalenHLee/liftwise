@@ -10,11 +10,14 @@ function list(items: string[]): string {
 const capitalise = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const num = (n: number) => String(Math.round(n * 10) / 10);
 
-/** "9.5" or, when values differ, "9.5–10". */
+/** Notes only mention weekly volume that misses the band by a whole set or more (decision 25). */
+export const VOLUME_NOTE_TOLERANCE = 1;
+
+/** Whole sets: "9" or, when values differ, "7–9". */
 function span(values: number[]): string {
-  const lo = Math.min(...values);
-  const hi = Math.max(...values);
-  return lo === hi ? num(lo) : `${num(lo)}–${num(hi)}`;
+  const lo = Math.round(Math.min(...values));
+  const hi = Math.round(Math.max(...values));
+  return lo === hi ? String(lo) : `${lo}–${hi}`;
 }
 
 /** 1 -> "once", 2 -> "twice", 1.3 -> "about 1.3 times", [1, 1.5] -> "1–1.5 times". */
@@ -55,10 +58,15 @@ export function programNotes(check: ProgramCheck): string[] {
       }
       case "below_band":
       case "above_band": {
-        const w = who(issue.muscles.map((m) => m.muscle), trainedCount);
-        const side = issue.kind === "below_band" ? "below" : "above";
+        // The check is exact; a miss of less than a set a week (e.g. 9.5 of 10) counts as meeting it.
+        const below = issue.kind === "below_band";
+        const muscles = issue.muscles.filter((m) =>
+          below ? issue.band.min - m.setsPerWeek >= VOLUME_NOTE_TOLERANCE : m.setsPerWeek - issue.band.max >= VOLUME_NOTE_TOLERANCE,
+        );
+        if (!muscles.length) break;
+        const w = who(muscles.map((m) => m.muscle), trainedCount);
         notes.push(
-          `${capitalise(w.name)} ${w.one ? "gets" : "get"} ${span(issue.muscles.map((m) => m.setsPerWeek))} sets a week, ${side} your ${issue.band.min}–${issue.band.max} target.`,
+          `${capitalise(w.name)} ${w.one ? "gets" : "get"} ${span(muscles.map((m) => m.setsPerWeek))} sets a week, ${below ? "below" : "above"} your ${issue.band.min}–${issue.band.max} target.`,
         );
         break;
       }

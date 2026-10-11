@@ -134,7 +134,7 @@ describe("tradeoff notes come from the check", () => {
   });
 
   test("volume below the band names the target", () => {
-    expect(notesFor("upper_lower", 2, "advanced")).toContain("Every muscle gets 9.5–10 sets a week, below your 14–20 target.");
+    expect(notesFor("upper_lower", 2, "advanced")).toContain("Every muscle gets 10 sets a week, below your 14–20 target.");
   });
 
   test("a split that meets every rule has no notes", () => {
@@ -148,6 +148,30 @@ describe("tradeoff notes come from the check", () => {
       "Hamstrings, calves and core aren't trained with your equipment.",
       "Most muscles get 5 sets a week, below your 10–12 target.",
     ]);
+  });
+
+  test("a shortfall under 1 set a week is no warning, but the check keeps the exact numbers", () => {
+    // Upper/Lower on 2 days, beginner: some muscles land on 9.5 of 10 (half sets from secondary muscles).
+    const setup = { daysPerWeek: 2, experience: "beginner" as const, equipment: "full_gym" as const };
+    const check = checkFor(generateProgram("upper_lower", setup), setup);
+    const below = check.issues.find((i) => i.kind === "below_band");
+    expect(below?.kind === "below_band" && below.muscles.map((m) => m.setsPerWeek)).toContain(9.5);
+    expect(programNotes(check)).toEqual(["Trains most muscles once a week (twice is the target)."]);
+  });
+
+  test("volume notes show whole sets and start at a full set short or over", () => {
+    const week = (setsPerWeek: number) => ({ timesPerWeek: 2, setsPerWeek, maxPerSession: 6 });
+    const muscles = Object.fromEntries(MUSCLES.map((m) => [m, week(11)])) as ProgramCheck["muscles"];
+    const band = { min: 10, max: 12 };
+    const below = (sets: number[]) =>
+      programNotes({ muscles, issues: [{ kind: "below_band", band, muscles: sets.map((s, i) => ({ muscle: (["chest", "back"] as const)[i], setsPerWeek: s })) }] });
+    expect(below([9.1])).toEqual([]);
+    expect(below([9])).toEqual(["Chest gets 9 sets a week, below your 10–12 target."]);
+    expect(below([8.6, 9.9])).toEqual(["Chest gets 9 sets a week, below your 10–12 target."]);
+    expect(below([7.3, 8.5])).toEqual(["Chest and back get 7–9 sets a week, below your 10–12 target."]);
+    const above = (s: number) => programNotes({ muscles, issues: [{ kind: "above_band", band, muscles: [{ muscle: "chest", setsPerWeek: s }] }] });
+    expect(above(12.5)).toEqual([]);
+    expect(above(13.4)).toEqual(["Chest gets 13 sets a week, above your 10–12 target."]);
   });
 
   test("names a few muscles, with the right verb", () => {
