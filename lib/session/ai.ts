@@ -1,3 +1,4 @@
+import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { getExercise } from "@/lib/exercises/library";
 import { MUSCLES, PAIN_AREAS, type CheckIn } from "@/lib/engine/types";
