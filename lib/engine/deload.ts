@@ -16,7 +16,8 @@ export type DeloadInput = {
   today: string;
 };
 
-const beats = (a: WeeklyBest, b: WeeklyBest) => a.loadKg > b.loadKg || (a.loadKg === b.loadKg && a.reps > b.reps);
+/** Heavier wins; at the same weight, more reps wins. */
+export const beats = (a: WeeklyBest, b: WeeklyBest) => a.loadKg > b.loadKg || (a.loadKg === b.loadKg && a.reps > b.reps);
 
 /** Stalled = neither of the last 2 weeks beat the best from before them. */
 export function isStalled(bests: WeeklyBest[]): boolean {

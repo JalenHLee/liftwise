@@ -107,3 +107,20 @@ describe("double progression", () => {
     expect(() => nextProgression(bench, target, [session(60, []), session(60, [])], green)).toThrow();
   });
 });
+
+describe("progression details used by logging (slice 6)", () => {
+  test("a set done lighter than the working weight doesn't count as hitting the top", () => {
+    const s: LoggedSession = { loadKg: 60, sets: [{ reps: 10, rir: 2, loadKg: 60 }, { reps: 10, rir: 2, loadKg: 60 }, { reps: 10, rir: 2, loadKg: 50 }] };
+    expect(nextProgression(bench, target, [s], green)).toMatchObject({ loadKg: 60, change: "hold" });
+  });
+
+  test("a held increase says how much was due and why", () => {
+    expect(nextProgression(bench, target, [session(60, [10, 10, 10])], { allowIncrease: false }).held).toEqual({ by: "day", dueKg: 2.5 });
+    expect(nextProgression(dbPress, target, [session(20, [10, 10, 10])], { allowIncrease: true, maxLoadKg: 20 }).held).toEqual({ by: "max", dueKg: 2 });
+    expect(nextProgression(bench, target, [session(60, [8, 8, 8])], green).held).toBeUndefined();
+  });
+
+  test("a partial session (fewer sets than planned) still progresses from the sets that were done", () => {
+    expect(nextProgression(bench, target, [session(60, [10, 10])], green)).toMatchObject({ loadKg: 62.5, change: "increase" });
+  });
+});

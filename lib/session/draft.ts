@@ -3,10 +3,12 @@ import { applyDeload } from "@/lib/engine/deload";
 import { maxLoadFor } from "@/lib/engine/equipment";
 import { applyPain, applySoreness, applyTimeLimit, estimateMinutes } from "@/lib/engine/modifiers";
 import { applyReadiness, scoreReadiness } from "@/lib/engine/readiness";
+import { nextProgression, type LoggedSession } from "@/lib/engine/progression";
 import { startingLoadFor, type RecentSet } from "@/lib/engine/startingLoad";
 import { MUSCLES, type CheckIn, type EquipmentSetup, type Exercise, type Experience, type Goal, type PlannedExercise, type Readiness } from "@/lib/engine/types";
 import { prescribeDay } from "@/lib/program/program";
 import type { Program } from "@/lib/program/types";
+import { formatKg } from "./display";
 import type { SessionExercise, SessionLoad, SessionPlan } from "./types";
 
 export type DraftProfile = {
@@ -23,6 +25,8 @@ export type DraftInput = {
   checkIn: CheckIn;
   /** Last solid set per exercise id, from onboarding. */
   startingWeights: Record<string, RecentSet>;
+  /** Logged sessions per exercise id, oldest first (deload sessions left out). Wins over starting weights. */
+  history?: Record<string, LoggedSession[]>;
   deload: { deload: boolean; reasons: string[] };
   /** What Claude read in the note, recorded on the plan (already merged into `checkIn`). */
   fromNote?: SessionPlan["fromNote"];
@@ -51,6 +55,67 @@ export function loadFor(exercise: Exercise, goal: Goal, setup: EquipmentSetup, r
   if (start.kind === "calibration") return start;
   const cap = maxLoadFor(exercise, setup);
   return { kind: "weight", kg: cap === undefined ? start.kg : Math.min(start.kg, cap) };
+}
+
+export type ExerciseLoad = {
+  load: SessionLoad;
+  targetReps?: number;
+  /** Mono tag for what progression did, e.g. "+2.5 KG" or "HELD · WAS DUE +2.5 KG". */
+  tag?: string;
+  /** One sentence for the exercise's explanation, when progression changed or held something. */
+  sentence?: string;
+};
+
+/** Why an increase is held today, for the explanation: "yellow day", "deload week". */
+export function holdCause(level: Readiness, deload: boolean): string {
+  return deload ? "deload week" : `${level} day`;
+}
+
+/**
+ * Today's weight and rep target for an exercise. With logged history: double progression
+ * (increases only on green, non-deload days; capped by the equipment). Without: the starting
+ * weight from onboarding, calibration, or bodyweight. `target` is the program's prescription
+ * before today's readiness changes, so a yellow day's easier RIR doesn't move the goalposts.
+ */
+export function exerciseLoad(
+  exercise: Exercise,
+  target: Pick<PlannedExercise, "repMin" | "repMax" | "rirMin">,
+  input: Pick<DraftInput, "profile" | "startingWeights" | "history">,
+  day: { level: Readiness; deload: boolean },
+): ExerciseLoad {
+  const { goal, equipment } = input.profile;
+  const history = (input.history?.[exercise.id] ?? []).filter((s) => s.sets.length > 0);
+  const bodyweight = exercise.loadIncrementKg <= 0;
+  // A weighted exercise logged without a weight can't progress; treat it as new.
+  if (!history.length || (!bodyweight && history.at(-1)!.loadKg <= 0)) {
+    return { load: loadFor(exercise, goal, equipment, input.startingWeights[exercise.id]) };
+  }
+
+  const cap = maxLoadFor(exercise, equipment);
+  const p = nextProgression(exercise, target, history, {
+    allowIncrease: day.level === "green" && !day.deload,
+    maxLoadKg: cap,
+  });
+  const load: SessionLoad = bodyweight ? { kind: "bodyweight" } : { kind: "weight", kg: cap === undefined ? p.loadKg : Math.min(p.loadKg, cap) };
+  const result: ExerciseLoad = { load, targetReps: p.targetReps };
+
+  if (p.held?.by === "day") {
+    result.tag = `HELD · WAS DUE +${formatKg(p.held.dueKg)} KG`;
+    result.sentence = `Due +${formatKg(p.held.dueKg)} kg, held because it's a ${holdCause(day.level, day.deload)}`;
+  } else if (p.held?.by === "max") {
+    result.tag = "AT MAX WEIGHT";
+    result.sentence = "Already at the heaviest weight available, so aim for the top of the range";
+  } else if (p.change === "increase") {
+    result.tag = `+${formatKg(exercise.loadIncrementKg)} KG`;
+    result.sentence = p.reason;
+  } else if (p.change === "decrease") {
+    result.tag = "−10% WEIGHT";
+    result.sentence = p.reason;
+  } else if (p.change === "more_reps") {
+    result.tag = "+1 REP";
+    result.sentence = p.reason;
+  }
+  return result;
 }
 
 export function rulesExplanation(adjustments: string[]): string | null {
@@ -128,12 +193,17 @@ export function buildDraft(input: DraftInput): SessionPlan {
 
   const exercises: SessionExercise[] = plan.map((e) => {
     const exercise = getExercise(e.exerciseId);
+    const base = day.exercises.find((b) => b.exerciseId === e.exerciseId) ?? e;
+    const load = exerciseLoad(exercise, base, input, { level: readiness.level, deload: input.deload.deload });
+    const own = e.adjustments.slice(dayWide.get(e.exerciseId) ?? 0);
     return {
       ...e,
       name: exercise.name,
-      load: loadFor(exercise, profile.goal, profile.equipment, input.startingWeights[e.exerciseId]),
-      tags: tags.get(e.exerciseId) ?? [],
-      explanation: rulesExplanation(e.adjustments.slice(dayWide.get(e.exerciseId) ?? 0)),
+      load: load.load,
+      ...(load.targetReps !== undefined && { targetReps: load.targetReps }),
+      ...(load.tag && { progressionTag: load.tag }),
+      tags: [...(tags.get(e.exerciseId) ?? []), ...(load.tag ? [load.tag] : [])],
+      explanation: rulesExplanation(load.sentence ? [...own, load.sentence] : own),
     };
   });
 

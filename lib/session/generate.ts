@@ -1,7 +1,7 @@
 import { getExercise } from "@/lib/exercises/library";
 import { MUSCLES, type CheckIn } from "@/lib/engine/types";
 import { buildUserMessage, callWithTimeout, PROMPT_VERSION, SESSION_MODEL, SYSTEM_PROMPT, type AiClient } from "./ai";
-import { buildDraft, loadFor, mergeCheckIn, type DraftInput } from "./draft";
+import { buildDraft, exerciseLoad, mergeCheckIn, programDay, type DraftInput } from "./draft";
 import { allowedSubstitutes } from "./substitutes";
 import type { SessionPlan, SessionSource, ValidationResult } from "./types";
 import { checkIds, checkInvariants, noteAdditions, parseAiOutput } from "./validate";
@@ -71,13 +71,22 @@ export async function generateSession(input: GenerateInput, ai: AiClient | null,
       continue;
     }
     const next = getExercise(swap.to);
+    // The substitute has the same type, so the original's program prescription is its target too.
+    const original = exercises[i];
+    const oldTag = original.progressionTag;
+    const target = programDay(input.program, goal, input.dayIndex).exercises.find((e) => e.exerciseId === swap.from) ?? original;
+    const load = exerciseLoad(next, target, input, { level: engine.readiness.level, deload: engine.deload.deload });
+    delete original.targetReps;
+    delete original.progressionTag;
     exercises[i] = {
-      ...exercises[i],
+      ...original,
       exerciseId: next.id,
       name: next.name,
-      load: loadFor(next, goal, equipment, input.startingWeights[next.id]),
+      load: load.load,
+      ...(load.targetReps !== undefined && { targetReps: load.targetReps }),
+      ...(load.tag && { progressionTag: load.tag }),
       swappedFrom: swap.from,
-      tags: [...exercises[i].tags, "SWAPPED"],
+      tags: [...original.tags.filter((t) => t !== oldTag), ...(load.tag ? [load.tag] : []), "SWAPPED"],
       explanation: swap.reason.trim(),
     };
   }

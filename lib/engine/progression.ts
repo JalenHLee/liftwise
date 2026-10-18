@@ -1,6 +1,7 @@
 import type { Exercise, PlannedExercise } from "./types";
 
-export type LoggedSet = { reps: number; rir: number };
+/** `loadKg` is this set's own weight when it differs from the session's working weight. */
+export type LoggedSet = { reps: number; rir: number; loadKg?: number };
 export type LoggedSession = { loadKg: number; sets: LoggedSet[] };
 
 export type ProgressionResult = {
@@ -8,6 +9,8 @@ export type ProgressionResult = {
   targetReps: number;
   change: "increase" | "hold" | "decrease" | "more_reps";
   reason: string;
+  /** Set when an increase was due but held back: why, and how much it would have been. */
+  held?: { by: "day" | "max"; dueKg: number };
 };
 
 export type ProgressionOptions = {
@@ -39,7 +42,8 @@ export function nextProgression(
   if (!last) throw new Error("Progression needs at least one logged session");
   const previous = logged.at(-2);
   const lowest = Math.min(...last.sets.map((s) => s.reps));
-  const hitTop = last.sets.every((s) => s.reps >= target.repMax && s.rir >= target.rirMin);
+  // A set done lighter than the working weight doesn't count as hitting the top.
+  const hitTop = last.sets.every((s) => s.reps >= target.repMax && s.rir >= target.rirMin && (s.loadKg ?? last.loadKg) >= last.loadKg);
   const aimOneMore = Math.min(target.repMax, Math.max(target.repMin, lowest + 1));
 
   if (exercise.loadIncrementKg === 0) {
@@ -58,10 +62,22 @@ export function nextProgression(
   if (hitTop) {
     const increased = last.loadKg + exercise.loadIncrementKg;
     if (!options.allowIncrease) {
-      return { loadKg: last.loadKg, targetReps: target.repMax, change: "hold", reason: "Ready for more weight, but today isn't the day to add it" };
+      return {
+        loadKg: last.loadKg,
+        targetReps: target.repMax,
+        change: "hold",
+        reason: "Ready for more weight, but today isn't the day to add it",
+        held: { by: "day", dueKg: exercise.loadIncrementKg },
+      };
     }
     if (options.maxLoadKg !== undefined && increased > options.maxLoadKg) {
-      return { loadKg: last.loadKg, targetReps: target.repMax, change: "hold", reason: "Already at the heaviest weight available" };
+      return {
+        loadKg: last.loadKg,
+        targetReps: target.repMax,
+        change: "hold",
+        reason: "Already at the heaviest weight available",
+        held: { by: "max", dueKg: exercise.loadIncrementKg },
+      };
     }
     return { loadKg: increased, targetReps: target.repMin, change: "increase", reason: `All sets at the top of the range, so add ${exercise.loadIncrementKg} kg` };
   }

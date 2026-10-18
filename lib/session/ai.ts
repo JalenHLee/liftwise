@@ -5,7 +5,7 @@ import type { SessionPlan } from "./types";
 
 export const SESSION_MODEL = "claude-sonnet-5";
 /** Bump whenever the system prompt or the output schema changes, so evals can compare versions. */
-export const PROMPT_VERSION = "session-v1";
+export const PROMPT_VERSION = "session-v2";
 export const AI_TIMEOUT_MS = 15_000;
 export const MAX_EXPLANATION_CHARS = 280;
 export const MAX_SUMMARY_CHARS = 400;
@@ -15,7 +15,7 @@ export const SYSTEM_PROMPT = `You are the coach voice of Liftwise, a fitness app
 You may only do three things:
 1. Swap an exercise for one of the substitutes listed for it under "allowedSubstitutes", and only when today's check-in gives a reason (for example the note mentions a joint that feels off, or equipment that is busy). Never swap without a reason. Use the exact ids given.
 2. Read the free-text note. If it clearly mentions pain in a body area, add that area to "addedPainAreas" (allowed values: ${PAIN_AREAS.join(", ")}). If it clearly mentions a sore muscle, add it to "addedSoreness" with a level from 2 (a little) to 5 (very sore) (muscles: ${MUSCLES.join(", ")}). Only add what the note actually says. These can only make the day easier.
-3. Write explanations: one short, plain sentence for each exercise that has adjustments or that you swapped (the swap's sentence goes in its "reason"), plus a 1-2 sentence "daySummary" for the whole day.
+3. Write explanations: one short, plain sentence for each exercise that has adjustments, a "progression" note (what the weight or rep target did since last time; mention it) or that you swapped (the swap's sentence goes in its "reason"), plus a 1-2 sentence "daySummary" for the whole day.
 
 Style: calm, warm, concrete, no hype, no emoji. Explain why, using the check-in. Never diagnose an injury or name a medical condition; if there is pain, say to get it checked by a medic/doctor. Do not mention numbers that are not in the plan.
 
@@ -81,6 +81,7 @@ export function buildUserMessage(draft: SessionPlan, checkIn: CheckIn & { note: 
       reps: `${e.repMin}-${e.repMax}`,
       repsInReserve: e.rirMin === e.rirMax ? `${e.rirMin}` : `${e.rirMin}-${e.rirMax}`,
       adjustments: e.adjustments,
+      progression: e.explanation && e.progressionTag ? e.explanation : null,
       allowedSubstitutes: (allowed[e.exerciseId] ?? []).map((id) => ({ id, name: getExercise(id).name })),
     })),
   });
